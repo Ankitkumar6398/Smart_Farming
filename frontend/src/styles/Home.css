@@ -1,0 +1,273 @@
+/* ---------- GENERAL LAYOUT ---------- */
+.home-container {
+  width: 100%;
+  min-height: 100vh;
+  background: #f4f7f4;
+  font-family: "Poppins", sans-serif;
+}
+
+/* ---------- HERO SECTION ---------- */
+.hero-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 70px 6%;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+/* ---------- TEXT CONTENT ---------- */
+.hero-content {
+  max-width: 550px;
+}
+
+.ai-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: #e8fff0;
+  padding: 8px 18px;
+  border-radius: 40px;
+  font-weight: 600;
+  color: #1b7f3a;
+  margin-bottom: 18px;
+}
+
+.ai-badge img {
+  width: 26px;
+  height: 26px;
+}
+
+.hero-title {
+  font-size: 3rem;
+  font-weight: 800;
+  color: #1a1a1a;
+  line-height: 1.2;
+}
+
+.gradient-text {
+  color: #2b8a53;
+}
+
+.hero-subtitle {
+  margin: 18px 0 25px;
+  color: #555;
+  line-height: 1.6;
+  font-size: 1.1rem;
+}
+
+/* ---------- STATS ---------- */
+.hero-stats {
+  display: flex;
+  gap: 25px;
+  margin: 30px 0;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-number {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #2b8a53;
+}
+
+.stat-label {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+/* ---------- BUTTONS ---------- */
+.hero-buttons {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.btn-primary-hero {
+  background: #2b8a53;
+  color: white;
+  padding: 12px 26px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.btn-primary-hero:hover {
+  background: #247746;
+}
+
+.btn-secondary-hero {
+  background: white;
+  color: #2b8a53;
+  padding: 12px 26px;
+  font-size: 1rem;
+  border: 2px solid #2b8a53;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary-hero:hover {
+  background: #e8ffe9;
+}
+
+/* ---------- HERO VISUAL IMAGES ---------- */
+.hero-visual {
+  position: relative;
+  width: 380px;
+  height: 380px;
+}
+
+.floating-card {
+  background: white;
+  padding: 12px 16px;
+  border-radius: 14px;
+  box-shadow: 0px 4px 18px rgba(0,0,0,0.12);
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 130px;
+  text-align: center;
+}
+
+.floating-card img {
+  width: 70px;
+  height: 70px;
+  object-fit: contain;
+  margin-bottom: 8px;
+}
+
+.floating-card:nth-child(1) {
+  top: 20px;
+  left: 10px;
+}
+
+.floating-card:nth-child(2) {
+  bottom: 40px;
+  left: 130px;
+}
+
+.floating-card:nth-child(3) {
+  top: 20px;
+  right: 10px;
+}
+
+.card-text {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #333;
+}
+
+/* ---------- FEATURES SECTION ---------- */
+.features-section {
+  margin-top: 80px;
+  padding: 40px 6%;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.section-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.section-subtitle {
+  color: #666;
+  font-size: 1rem;
+}
+
+/* ---------- FEATURE CARDS GRID ---------- */
+.modules-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 25px;
+}
+
+.feature-card {
+  background: white;
+  padding: 22px;
+  border-radius: 14px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  border-top: 4px solid transparent;
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 22px rgba(0,0,0,0.12);
+}
+
+.feature-img-box {
+  width: 70px;
+  height: 70px;
+  margin-bottom: 15px;
+}
+
+.feature-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.feature-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #1a1a1a;
+}
+
+.feature-desc {
+  color: #666;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  margin-bottom: 12px;
+}
+
+.feature-arrow {
+  font-size: 1.4rem;
+  color: #2b8a53;
+  font-weight: 700;
+}
+
+/* ---------- MOBILE RESPONSIVE ---------- */
+@media (max-width: 768px) {
+  .hero-section {
+    padding: 40px 4%;
+    text-align: center;
+    flex-direction: column;
+  }
+
+  .hero-stats {
+    justify-content: center;
+  }
+
+  .hero-buttons {
+    justify-content: center;
+  }
+
+  .hero-visual {
+    margin-top: 20px;
+    width: 100%;
+    height: 320px;
+  }
+
+  .floating-card {
+    width: 120px;
+  }
+
+  .modules-grid {
+    grid-template-columns: 1fr;
+  }
+}

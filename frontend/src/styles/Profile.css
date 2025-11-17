@@ -1,0 +1,144 @@
+.profile-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 60px 20px;
+    background: linear-gradient(to right, #e8f5e9, #f9fbe7);
+    min-height: 100vh;
+    font-family: "Poppins", sans-serif;
+  }
+  
+  .profile-card {
+    background-color: white;
+    border-radius: 20px;
+    width: 100%;
+    max-width: 600px;
+    padding: 30px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 0.4s ease-in-out;
+  }
+  
+  .profile-header {
+    text-align: center;
+    border-bottom: 2px solid #4caf50;
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .avatar-circle {
+    width: 80px;
+    height: 80px;
+    background-color: #4caf50;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2.5rem;
+    margin: 0 auto 15px;
+    font-weight: bold;
+  }
+  
+  .member-since {
+    color: #666;
+    font-size: 0.9rem;
+  }
+  
+  .profile-info {
+    margin-bottom: 25px;
+  }
+  
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    margin: 12px 0;
+    padding: 10px;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  .info-row label {
+    color: #2e7d32;
+    font-weight: 600;
+  }
+  
+  .info-row span {
+    color: #444;
+  }
+  
+  .info-row input {
+    width: 60%;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 6px 10px;
+  }
+  
+  .profile-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
+  
+  .btn-primary {
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  
+  .btn-primary:hover {
+    background-color: #388e3c;
+  }
+  
+  .btn-secondary {
+    background-color: #c8e6c9;
+    color: #2e7d32;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  
+  .btn-secondary:hover {
+    background-color: #a5d6a7;
+  }
+  
+  .btn-logout {
+    background-color: #ef5350;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  
+  .btn-logout:hover {
+    background-color: #c62828;
+  }
+  
+  .spinner {
+    width: 60px;
+    height: 60px;
+    border: 6px solid #c8e6c9;
+    border-top: 6px solid #4caf50;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 15px;
+  }
+  
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
