@@ -1,29 +1,44 @@
+:root {
+  --primary-green: #6F8F4E;
+  --primary-green-light: #AECF7A;
+  --primary-green-dark: #4E6A32;
+  --gradient-primary: linear-gradient(135deg, #6F8F4E, #98C45A);
+  --bg-light: #F7F9F4;
+  --bg-lighter: #FFFFFF;
+  --white: #FFFFFF;
+  --text-dark: #333333;
+  --text-medium: #6B7A5A;
+  --radius-lg: 14px;
+  --radius-full: 40px;
+  --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-medium: 0 6px 18px rgba(0, 0, 0, 0.12);
+  --shadow-hover: 0 8px 25px rgba(111, 143, 78, 0.35);
+  --transition-normal: 0.25s ease;
+}
+
 .crop-container {
   text-align: center;
   padding: 3rem 1.5rem;
-  background: linear-gradient(180deg, var(--bg-light) 0%, var(--bg-lighter) 100%);
+  background: linear-gradient(180deg, var(--bg-light), var(--bg-lighter));
   min-height: calc(100vh - 200px);
   font-family: "Poppins", sans-serif;
 }
 
 .crop-container h1 {
-  color: var(--primary-green);
   font-size: clamp(2rem, 4vw, 2.8rem);
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.6rem;
   font-weight: 700;
   background: var(--gradient-primary);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  background-clip: text;
 }
 
 .crop-container > p {
   color: var(--text-medium);
-  font-size: 1.1rem;
-  margin-bottom: 2rem;
+  font-size: 1.15rem;
+  margin: 0 auto 2rem;
   max-width: 600px;
-  margin-left: auto;
-  margin-right: auto;
+  line-height: 1.7;
 }
 
 .crop-container input[type="file"] {
@@ -33,14 +48,14 @@
   background: var(--white);
   color: var(--text-dark);
   cursor: pointer;
-  transition: var(--transition-normal);
-  margin: 1.5rem 0;
   font-size: 1rem;
+  margin: 1.5rem 0;
+  transition: var(--transition-normal);
 }
 
 .crop-container input[type="file"]:hover {
   border-color: var(--primary-green);
-  background: var(--pale-green);
+  background: #F1F7EA;
   transform: translateY(-2px);
   box-shadow: var(--shadow-soft);
 }
@@ -49,21 +64,21 @@
   width: min(100%, 400px);
   max-height: 400px;
   object-fit: contain;
-  border-radius: var(--radius-lg);
   margin: 2rem auto;
-  box-shadow: var(--shadow-medium);
-  border: 3px solid var(--white);
-  transition: var(--transition-normal);
   display: block;
+  border-radius: var(--radius-lg);
+  border: 3px solid var(--white);
+  box-shadow: var(--shadow-medium);
+  transition: var(--transition-normal);
 }
 
 .preview:hover {
-  transform: scale(1.02);
+  transform: scale(1.03);
   box-shadow: var(--shadow-hover);
 }
 
 .crop-container button {
-  padding: 0.85rem 2rem;
+  padding: 0.9rem 2.4rem;
   border: none;
   background: var(--gradient-primary);
   color: var(--white);
@@ -71,9 +86,9 @@
   cursor: pointer;
   font-size: 1rem;
   font-weight: 600;
-  transition: var(--transition-normal);
   box-shadow: var(--shadow-soft);
-  margin: 1rem 0;
+  transition: var(--transition-normal);
+  margin-top: 1rem;
 }
 
 .crop-container button:hover {
@@ -87,34 +102,35 @@
 
 .result-card {
   background: var(--white);
-  margin: 2.5rem auto;
   width: min(90%, 600px);
-  border-radius: var(--radius-lg);
+  margin: 2.5rem auto;
   padding: 2rem;
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow-medium);
   border-left: 4px solid var(--primary-green);
-  animation: slideUp 0.5s ease;
+  animation: slideUp 0.45s ease;
   text-align: left;
 }
 
 .result-card h2 {
   color: var(--primary-green);
   font-size: 1.5rem;
+  font-weight: 700;
   margin-bottom: 1rem;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.6rem;
 }
 
 .result-card h2::before {
-  content: '🤖';
-  font-size: 1.8rem;
+  content: '🌿';
+  font-size: 1.7rem;
 }
 
 .result-card p {
   color: var(--text-medium);
+  font-size: 1rem;
   line-height: 1.8;
-  margin-top: 0.5rem;
 }
 
 .result-card strong {

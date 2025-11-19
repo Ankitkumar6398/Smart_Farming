@@ -1,119 +1,90 @@
-/* ==========================
-   MARKET PAGE – MODERN DESIGN
-   ========================== */
+.market-container {
+  text-align: center;
+  background: linear-gradient(180deg, #ffffff 0%, #f6fcf7 100%);
+  padding: 3rem 1.5rem;
+  min-height: calc(100vh - 200px);
+  font-family: "Poppins", sans-serif;
+}
 
-   .market-container {
-    text-align: center;
-    background: linear-gradient(180deg, #f4fbe7 0%, #ffffff 100%);
-    padding: 3rem 1.5rem;
-    min-height: calc(100vh - 200px);
-    font-family: "Poppins", sans-serif;
+.market-container h1 {
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  margin-bottom: 0.6rem;
+  font-weight: 700;
+  background: linear-gradient(90deg, #3e8f51, #7ac28a);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.market-container > p {
+  color: #5a6a5a;
+  font-size: 1.12rem;
+  margin-bottom: 2.6rem;
+  max-width: 600px;
+  margin-inline: auto;
+}
+
+.market-container table {
+  margin: 2.5rem auto;
+  width: min(95%, 800px);
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #ffffff;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.market-container th {
+  padding: 1rem 1.25rem;
+  background: linear-gradient(90deg, #3e8f51, #68b678);
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: 0.4px;
+  text-align: left;
+}
+
+.market-container td {
+  padding: 1rem 1.25rem;
+  color: #2f2f2f;
+  border-bottom: 1px solid #d5ebd7;
+  transition: background 0.25s ease;
+}
+
+.market-container tr:last-child td {
+  border-bottom: none;
+}
+
+.market-container tr:hover td {
+  background: #e9f5eb;
+}
+
+.market-container td:last-child {
+  font-weight: 700;
+  color: #3e8f51;
+  font-size: 1.08rem;
+}
+
+.chart {
+  width: min(95%, 800px);
+  margin: 3rem auto;
+  background: #ffffff;
+  padding: 2rem;
+  border-radius: 14px;
+  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+@media (max-width: 768px) {
+  .market-container {
+    padding: 2rem 1rem;
   }
-  
-  /* Heading */
-  .market-container h1 {
-    color: #2e7d32;
-    font-size: clamp(2rem, 4vw, 2.8rem);
-    margin-bottom: 0.5rem;
-    font-weight: 700;
-    background: linear-gradient(90deg, #2e7d32, #26a69a);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-  
-  /* Subtitle */
-  .market-container > p {
-    color: #5f6b5f;
-    font-size: 1.1rem;
-    margin-bottom: 2.5rem;
-    max-width: 600px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-  
-  /* Table Container */
-  .market-container table {
-    margin: 2.5rem auto;
-    border-collapse: separate;
-    border-spacing: 0;
-    width: min(95%, 800px);
-    background-color: #ffffff;
-    box-shadow: 0px 6px 18px rgba(0, 0, 0, 0.1);
-    border-radius: 14px;
-    overflow: hidden;
-  }
-  
-  /* Table Cells */
+
   .market-container th,
   .market-container td {
-    padding: 1rem 1.25rem;
-    text-align: left;
+    padding: 0.75rem 0.55rem;
   }
-  
-  /* Table Header */
-  .market-container th {
-    background: linear-gradient(90deg, #2e7d32, #26a69a);
-    color: white;
-    font-weight: 600;
-    font-size: 1rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-  
-  /* Table Data */
-  .market-container td {
-    color: #333;
-    border-bottom: 1px solid #e6f2e6;
-    transition: 0.25s ease;
-  }
-  
-  /* Last row */
-  .market-container tr:last-child td {
-    border-bottom: none;
-  }
-  
-  /* Row Hover Effect */
-  .market-container tr:hover td {
-    background-color: #e6f7ec;
-    transform: scale(1.01);
-  }
-  
-  /* Price Column Styling */
-  .market-container tr td:last-child {
-    font-weight: 700;
-    color: #2e7d32;
-    font-size: 1.1rem;
-  }
-  
-  /* Chart Card */
+
   .chart {
-    width: min(95%, 800px);
-    margin: 3rem auto;
-    background: #ffffff;
-    padding: 2rem;
-    border-radius: 14px;
-    box-shadow: 0px 6px 18px rgba(0, 0, 0, 0.1);
+    padding: 1.2rem;
   }
-  
-  /* ==========================
-     RESPONSIVE DESIGN
-     ========================== */
-  @media (max-width: 768px) {
-    .market-container {
-      padding: 2rem 1rem;
-    }
-  
-    .market-container table {
-      font-size: 0.92rem;
-    }
-  
-    .market-container th,
-    .market-container td {
-      padding: 0.75rem 0.5rem;
-    }
-  
-    .chart {
-      padding: 1rem;
-    }
-  }
-  
+}
