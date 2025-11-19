@@ -5,7 +5,6 @@
 }
 
 :root {
-  /* Natural Green Palette - Agriculture Theme */
   --primary-green: #2e7d32;
   --primary-green-dark: #1b5e20;
   --primary-green-light: #4caf50;
@@ -15,13 +14,11 @@
   --bg-light: #f9fbe7;
   --bg-lighter: #f1f8e9;
   
-  /* AI/Tech Accents */
   --tech-blue: #26a69a;
   --tech-teal: #00897b;
   --gradient-primary: linear-gradient(135deg, #2e7d32 0%, #26a69a 100%);
   --gradient-light: linear-gradient(135deg, rgba(46, 125, 50, 0.1) 0%, rgba(38, 166, 154, 0.1) 100%);
   
-  /* Neutral Colors */
   --text-dark: #1b4332;
   --text-medium: #2d5016;
   --text-light: #555;
@@ -30,14 +27,12 @@
   --shadow-medium: 0 8px 30px rgba(46, 125, 50, 0.2);
   --shadow-hover: 0 12px 40px rgba(46, 125, 50, 0.25);
   
-  /* Border Radius */
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
   --radius-xl: 24px;
   --radius-full: 999px;
   
-  /* Transitions */
   --transition-fast: 0.2s ease;
   --transition-normal: 0.3s ease;
   --transition-slow: 0.5s ease;
@@ -60,12 +55,10 @@ code {
     monospace;
 }
 
-/* Smooth scroll behavior */
 html {
   scroll-behavior: smooth;
 }
 
-/* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 10px;
 }

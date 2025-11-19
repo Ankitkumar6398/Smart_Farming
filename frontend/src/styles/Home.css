@@ -1,6 +1,3 @@
-/* ------------------------------
-   GLOBAL LAYOUT
------------------------------- */
 .home-container {
   width: 100%;
   min-height: 100vh;
@@ -9,9 +6,6 @@
   overflow-x: hidden;
 }
 
-/* ------------------------------
-   HERO SECTION
------------------------------- */
 .hero-section {
   display: flex;
   justify-content: space-between;
@@ -21,9 +15,6 @@
   flex-wrap: wrap;
 }
 
-/* ------------------------------
-   LEFT TEXT AREA
------------------------------- */
 .hero-content {
   max-width: 560px;
 }
@@ -63,9 +54,6 @@
   line-height: 1.6;
 }
 
-/* ------------------------------
-   STATS
------------------------------- */
 .hero-stats {
   display: flex;
   gap: 28px;
@@ -87,9 +75,6 @@
   font-size: 0.9rem;
 }
 
-/* ------------------------------
-   BUTTONS
------------------------------- */
 .hero-buttons {
   display: flex;
   gap: 15px;
@@ -127,9 +112,6 @@
   color: white;
 }
 
-/* ------------------------------
-   HERO RIGHT-SIDE VISUAL
------------------------------- */
 .hero-visual {
   position: relative;
   width: 380px;
@@ -182,9 +164,6 @@
   100% { transform: translateY(0px); }
 }
 
-/* ------------------------------
-   FEATURE SECTION
------------------------------- */
 .features-section {
   margin-top: 80px;
   padding: 40px 6%;
@@ -206,9 +185,6 @@
   font-size: 1rem;
 }
 
-/* ------------------------------
-   FEATURE GRID
------------------------------- */
 .modules-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -266,9 +242,6 @@
   color: #a7d129;
 }
 
-/* ------------------------------
-   MOBILE
------------------------------- */
 @media (max-width: 768px) {
   .hero-section {
     padding: 40px 4%;

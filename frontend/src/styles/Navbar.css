@@ -1,5 +1,3 @@
-/* ---------------- NAVBAR ---------------- */
-
 .navbar {
   display: flex;
   align-items: center;
@@ -21,8 +19,6 @@
   color: #A7D129;
 }
 
-/* ---------------- LOGO ---------------- */
-
 .logo {
   font-size: 1.45rem;
   font-weight: 700;
@@ -35,8 +31,6 @@
   opacity: 0.95;
   transform: translateY(-1px);
 }
-
-/* ---------------- NAV LINKS ---------------- */
 
 .nav-links {
   display: flex;
@@ -54,7 +48,6 @@
   transition: 0.25s ease;
 }
 
-/* Underline animation */
 .nav-links li a::after {
   content: "";
   position: absolute;
@@ -75,8 +68,6 @@
   width: 65%;
 }
 
-
-/* ---------------- RESPONSIVE ---------------- */
 
 @media (max-width: 768px) {
   .navbar {
