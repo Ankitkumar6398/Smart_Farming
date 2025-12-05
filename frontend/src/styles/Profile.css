@@ -1,144 +1,234 @@
+/* ---------------------------------------------------------
+   SMART FARMING PROFILE PAGE
+--------------------------------------------------------- */
+
+:root {
+  --green-dark: #2e7d32;
+  --green-mid: #43a047;
+  --green-light: #c8e6c9;
+
+  --red: #ef5350;
+  --red-dark: #c62828;
+
+  --gray-900: #1e1e1e;
+  --gray-700: #4a4a4a;
+  --gray-500: #7d7d7d;
+  --gray-300: #e0e0e0;
+
+  --white: #ffffff;
+
+  --radius: 16px;
+  --radius-full: 50px;
+
+  --shadow-soft: 0 8px 22px rgba(0, 0, 0, 0.08);
+  --shadow-card: 0 14px 34px rgba(0, 0, 0, 0.12);
+
+  --transition: 260ms ease;
+}
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
+
+/* ---------------------------------------------------------
+   CONTAINER
+--------------------------------------------------------- */
+
 .profile-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 60px 20px;
-    background: linear-gradient(to right, #e8f5e9, #f9fbe7);
-    min-height: 100vh;
-    font-family: "Poppins", sans-serif;
-  }
-  
-  .profile-card {
-    background-color: white;
-    border-radius: 20px;
-    width: 100%;
-    max-width: 600px;
-    padding: 30px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-    animation: fadeIn 0.4s ease-in-out;
-  }
-  
-  .profile-header {
-    text-align: center;
-    border-bottom: 2px solid #4caf50;
-    padding-bottom: 20px;
-    margin-bottom: 20px;
-  }
-  
-  .avatar-circle {
-    width: 80px;
-    height: 80px;
-    background-color: #4caf50;
-    color: white;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 2.5rem;
-    margin: 0 auto 15px;
-    font-weight: bold;
-  }
-  
-  .member-since {
-    color: #666;
-    font-size: 0.9rem;
-  }
-  
-  .profile-info {
-    margin-bottom: 25px;
-  }
-  
-  .info-row {
-    display: flex;
-    justify-content: space-between;
-    margin: 12px 0;
-    padding: 10px;
-    border-bottom: 1px solid #e0e0e0;
-  }
-  
-  .info-row label {
-    color: #2e7d32;
-    font-weight: 600;
-  }
-  
-  .info-row span {
-    color: #444;
-  }
-  
-  .info-row input {
-    width: 60%;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    padding: 6px 10px;
-  }
-  
-  .profile-buttons {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px;
-  }
-  
-  .btn-primary {
-    background-color: #4caf50;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 25px;
-    cursor: pointer;
-    transition: 0.3s;
-  }
-  
-  .btn-primary:hover {
-    background-color: #388e3c;
-  }
-  
-  .btn-secondary {
-    background-color: #c8e6c9;
-    color: #2e7d32;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 25px;
-    cursor: pointer;
-    transition: 0.3s;
-  }
-  
-  .btn-secondary:hover {
-    background-color: #a5d6a7;
-  }
-  
-  .btn-logout {
-    background-color: #ef5350;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 25px;
-    cursor: pointer;
-    transition: 0.3s;
-  }
-  
-  .btn-logout:hover {
-    background-color: #c62828;
-  }
-  
-  .spinner {
-    width: 60px;
-    height: 60px;
-    border: 6px solid #c8e6c9;
-    border-top: 6px solid #4caf50;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin-bottom: 15px;
-  }
-  
-  @keyframes spin {
-    to {
-      transform: rotate(360deg);
-    }
-  }
-  
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 20px;
+  min-height: 100vh;
+
+  background:
+    radial-gradient(circle at top left, rgba(76, 175, 80, 0.18), transparent 70%),
+    radial-gradient(circle at bottom right, rgba(56, 142, 60, 0.15), transparent 70%),
+    linear-gradient(180deg, #f3fff3, #ffffff);
+
+  font-family: "Inter", sans-serif;
+}
+
+/* ---------------------------------------------------------
+   CARD
+--------------------------------------------------------- */
+
+.profile-card {
+  width: 100%;
+  max-width: 620px;
+  padding: 32px;
+
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-soft);
+
+  animation: fadeIn 0.4s ease-in-out;
+  transition: var(--transition);
+}
+
+.profile-card:hover {
+  box-shadow: var(--shadow-card);
+}
+
+/* ---------------------------------------------------------
+   HEADER
+--------------------------------------------------------- */
+
+.profile-header {
+  text-align: center;
+  padding-bottom: 20px;
+  margin-bottom: 24px;
+
+  border-bottom: 2px solid var(--green-mid);
+}
+
+.avatar-circle {
+  width: 90px;
+  height: 90px;
+
+  background: var(--green-mid);
+  color: white;
+
+  border-radius: 50%;
+  font-size: 2.7rem;
+  font-weight: 700;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  margin: 0 auto 15px;
+  box-shadow: 0 6px 16px rgba(76, 175, 80, 0.35);
+}
+
+.member-since {
+  color: var(--gray-500);
+  font-size: 0.9rem;
+  margin-top: -6px;
+}
+
+/* ---------------------------------------------------------
+   PROFILE INFO
+--------------------------------------------------------- */
+
+.profile-info {
+  margin-bottom: 28px;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 12px 0;
+  border-bottom: 1px solid var(--gray-300);
+}
+
+.info-row label {
+  color: var(--green-dark);
+  font-weight: 600;
+}
+
+.info-row span {
+  color: var(--gray-900);
+  font-weight: 500;
+}
+
+.info-row input {
+  width: 60%;
+  border: 1px solid #bbb;
+  border-radius: 8px;
+
+  padding: 7px 12px;
+  font-size: 0.95rem;
+  font-family: inherit;
+
+  transition: var(--transition);
+}
+
+.info-row input:focus {
+  border-color: var(--green-mid);
+  outline: none;
+  box-shadow: 0 0 4px rgba(76, 175, 80, 0.3);
+}
+
+/* ---------------------------------------------------------
+   BUTTONS
+--------------------------------------------------------- */
+
+.profile-buttons {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.btn-primary,
+.btn-secondary,
+.btn-logout {
+  padding: 10px 24px;
+  border-radius: var(--radius-full);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  border: none;
+}
+
+/* Save Button */
+.btn-primary {
+  background: var(--green-mid);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: var(--green-dark);
+}
+
+/* Edit Button */
+.btn-secondary {
+  background: var(--green-light);
+  color: var(--green-dark);
+}
+
+.btn-secondary:hover {
+  background: #a5d6a7;
+}
+
+/* Logout Button */
+.btn-logout {
+  background: var(--red);
+  color: white;
+}
+
+.btn-logout:hover {
+  background: var(--red-dark);
+}
+
+/* ---------------------------------------------------------
+   LOADING SPINNER
+--------------------------------------------------------- */
+
+.spinner {
+  width: 60px;
+  height: 60px;
+
+  border: 6px solid #c8e6c9;
+  border-top: 6px solid var(--green-mid);
+
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+
+  margin-bottom: 15px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ---------------------------------------------------------
+   ANIMATIONS
+--------------------------------------------------------- */
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
