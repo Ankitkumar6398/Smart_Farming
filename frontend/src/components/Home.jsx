@@ -70,6 +70,7 @@ const Home = () => {
   const communityImg = "/images/community.webp"
   const schemesImg = "/images/schemes.webp"
   const AI = "/images/AI.webp"
+  const backgroundImg = "/images/farmer.jpg"
 
   
   const modules = [
