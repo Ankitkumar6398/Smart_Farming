@@ -1,394 +1,450 @@
+/* -------------------------------------------------------------
+   MARKET PRICE DASHBOARD — CLEAN PROFESSIONAL VERSION
+   Author: Ankit Kumar
+-------------------------------------------------------------- */
+
 import React, { useEffect, useState } from "react";
 import "../styles/Market.css";
+
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  CartesianGrid,
-  LineChart,
-  Line,
+  BarChart, Bar, XAxis, YAxis, Tooltip,
+  ResponsiveContainer, CartesianGrid,
+  LineChart, Line, Legend, Cell
 } from "recharts";
 
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
 const Market = () => {
+
+  /* -------------------------------------------------------------
+     STATE MANAGEMENT
+  -------------------------------------------------------------- */
+
   const [prices, setPrices] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [states, setStates] = useState([]);
-  const [districts, setDistricts] = useState([]);
-  const [crops, setCrops] = useState([]);
-  const [markets, setMarkets] = useState([]);
-  
+
   // Filters
   const [selectedState, setSelectedState] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [selectedCrop, setSelectedCrop] = useState("");
   const [selectedMarket, setSelectedMarket] = useState("");
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
-  
-  // Real-time update
+  const [selectedDate, setSelectedDate] = useState(
+    new Date().toISOString().split("T")[0]
+  );
+
+  // Lists
+  const [states, setStates] = useState([]);
+  const [districts, setDistricts] = useState([]);
+  const [crops, setCrops] = useState([]);
+  const [markets, setMarkets] = useState([]);
+
+  // UI Helpers
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [lastUpdated, setLastUpdated] = useState(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [syncMessage, setSyncMessage] = useState(null);
 
-  // Fetch states list
+  // Chart crop filter
+  const [selectedCropFromLegend, setSelectedCropFromLegend] = useState(null);
+
+
+  /* -------------------------------------------------------------
+     INITIAL LOAD
+  -------------------------------------------------------------- */
+
   useEffect(() => {
     fetchStates();
     fetchCrops();
   }, []);
 
-  // Fetch districts when state changes
+
+  /* -------------------------------------------------------------
+     STATE → DISTRICT → MARKET CHAIN
+  -------------------------------------------------------------- */
+
   useEffect(() => {
     if (selectedState) {
       fetchDistricts(selectedState);
-      setSelectedDistrict(""); // Reset district when state changes
-      setSelectedMarket(""); // Reset market when state changes
+      setSelectedDistrict("");
+      setSelectedMarket("");
     } else {
       setDistricts([]);
       setMarkets([]);
     }
   }, [selectedState]);
 
-  // Fetch markets when state or district changes
   useEffect(() => {
     if (selectedState) {
       fetchMarkets(selectedState, selectedDistrict);
-      if (!selectedDistrict) {
-        setSelectedMarket(""); // Reset market when district changes
-      }
+      if (!selectedDistrict) setSelectedMarket("");
     } else {
       setMarkets([]);
     }
   }, [selectedState, selectedDistrict]);
 
-  // Fetch prices when filters change
+
+  /* -------------------------------------------------------------
+     FETCH PRICES WHEN FILTERS CHANGE
+  -------------------------------------------------------------- */
+
   useEffect(() => {
     fetchMarketPrices();
   }, [selectedState, selectedDistrict, selectedCrop, selectedMarket, selectedDate]);
 
-  // Auto-refresh every 30 seconds
-  useEffect(() => {
-    if (autoRefresh) {
-      const interval = setInterval(() => {
-        fetchMarketPrices();
-      }, 30000); // 30 seconds
 
-      return () => clearInterval(interval);
-    }
+  /* -------------------------------------------------------------
+     AUTO REFRESH EVERY 30s
+  -------------------------------------------------------------- */
+
+  useEffect(() => {
+    if (!autoRefresh) return;
+    const interval = setInterval(() => fetchMarketPrices(), 30000);
+    return () => clearInterval(interval);
   }, [autoRefresh, selectedState, selectedDistrict, selectedCrop, selectedMarket, selectedDate]);
+
+
+  /* -------------------------------------------------------------
+     API FUNCTIONS
+  -------------------------------------------------------------- */
 
   const fetchStates = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/market/states`);
-      const data = await response.json();
-      if (data.success) {
-        setStates(data.data);
-      }
-    } catch (error) {
-      console.error("Error fetching states:", error);
+      const res = await fetch(`${API_URL}/api/market/states`);
+      const json = await res.json();
+      if (json.success) setStates(json.data);
+    } catch {
+      console.error("Error loading states");
     }
   };
 
   const fetchDistricts = async (state) => {
     try {
-      const response = await fetch(`${API_URL}/api/market/districts?state=${encodeURIComponent(state)}`);
-      const data = await response.json();
-      if (data.success) {
-        setDistricts(data.data);
-      }
-    } catch (error) {
-      console.error("Error fetching districts:", error);
+      const res = await fetch(
+        `${API_URL}/api/market/districts?state=${encodeURIComponent(state)}`
+      );
+      const json = await res.json();
+      if (json.success) setDistricts(json.data);
+    } catch {
+      console.error("Error loading districts");
     }
   };
 
   const fetchCrops = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/market/crops`);
-      const data = await response.json();
-      if (data.success) {
-        setCrops(data.data);
-      }
-    } catch (error) {
-      console.error("Error fetching crops:", error);
+      const res = await fetch(`${API_URL}/api/market/crops`);
+      const json = await res.json();
+      if (json.success) setCrops(json.data);
+    } catch {
+      console.error("Error loading crops");
     }
   };
 
   const fetchMarkets = async (state, district) => {
     try {
-      const params = new URLSearchParams();
-      params.append('state', state);
-      if (district) {
-        params.append('district', district);
-      }
-      const response = await fetch(`${API_URL}/api/market/markets?${params.toString()}`);
-      const data = await response.json();
-      if (data.success) {
-        setMarkets(data.data);
-      }
-    } catch (error) {
-      console.error("Error fetching markets:", error);
+      const params = new URLSearchParams({ state });
+      if (district) params.append("district", district);
+
+      const res = await fetch(`${API_URL}/api/market/markets?${params}`);
+      const json = await res.json();
+
+      if (json.success) setMarkets(json.data);
+    } catch {
+      console.error("Error loading markets");
     }
   };
+
+
+  /* -------------------------------------------------------------
+     FETCH PRICES (REALTIME FIRST, THEN DB)
+  -------------------------------------------------------------- */
 
   const fetchMarketPrices = async (useRealtime = true) => {
     try {
-      if (!loading) setIsRefreshing(true);
-      else setLoading(true);
-      
+      setLoading(false);
+      setIsRefreshing(true);
+
       const params = new URLSearchParams();
-      if (selectedState) params.append('state', selectedState);
-      if (selectedDistrict) params.append('district', selectedDistrict);
-      if (selectedCrop) params.append('crop', selectedCrop);
-      if (selectedMarket) params.append('market', selectedMarket);
-      if (selectedDate) params.append('date', selectedDate);
-      if (useRealtime) params.append('useRealtime', 'true');
+      if (selectedState) params.append("state", selectedState);
+      if (selectedDistrict) params.append("district", selectedDistrict);
+      if (selectedCrop) params.append("crop", selectedCrop);
+      if (selectedMarket) params.append("market", selectedMarket);
+      if (selectedDate) params.append("date", selectedDate);
+      if (useRealtime) params.append("useRealtime", "true");
 
-      // Try real-time API first, fallback to database
-      let response = await fetch(`${API_URL}/api/market?${params.toString()}`);
-      let data = await response.json();
+      let res = await fetch(`${API_URL}/api/market?${params}`);
+      let json = await res.json();
 
-      // If real-time failed, try direct real-time endpoint
-      if (!data.success && useRealtime) {
+      if (!json.success && useRealtime) {
         try {
-          const realtimeParams = new URLSearchParams();
-          if (selectedState) realtimeParams.append('state', selectedState);
-          if (selectedDistrict) realtimeParams.append('district', selectedDistrict);
-          if (selectedCrop) realtimeParams.append('crop', selectedCrop);
-          if (selectedMarket) realtimeParams.append('market', selectedMarket);
-          
-          response = await fetch(`${API_URL}/api/market/realtime?${realtimeParams.toString()}`);
-          data = await response.json();
-        } catch (realtimeError) {
-          console.log('Real-time API failed, using database data');
-        }
+          params.delete("useRealtime");
+          res = await fetch(`${API_URL}/api/market/realtime?${params}`);
+          json = await res.json();
+        } catch {}
       }
 
-      if (data.success && data.data && data.data.length > 0) {
-        setPrices(data.data);
-        setLastUpdated(new Date());
-      } else {
-        // Fallback to dummy data if API fails
-        setPrices(getDummyData());
-        setLastUpdated(new Date());
-      }
-    } catch (error) {
-      console.error("Error fetching market prices:", error);
-      // Fallback to dummy data
-      setPrices(getDummyData());
+      setPrices(json.success ? json.data : []);
+      setLastUpdated(new Date());
+    } catch {
+      setPrices([]);
       setLastUpdated(new Date());
     } finally {
-      setLoading(false);
       setIsRefreshing(false);
+      setLoading(false);
     }
   };
 
-  const getDummyData = () => {
-    return [
-      { crop: "Wheat", state: "Punjab", district: "Ludhiana", market: "Ludhiana Mandi", price: 2420, unit: "Quintal", date: new Date() },
-      { crop: "Rice", state: "Haryana", district: "Karnal", market: "Karnal Mandi", price: 3200, unit: "Quintal", date: new Date() },
-      { crop: "Sugarcane", state: "Uttar Pradesh", district: "Meerut", market: "Meerut Mandi", price: 340, unit: "Quintal", date: new Date() },
-      { crop: "Maize", state: "Madhya Pradesh", district: "Indore", market: "Indore Mandi", price: 1920, unit: "Quintal", date: new Date() },
-      { crop: "Cotton", state: "Gujarat", district: "Rajkot", market: "Rajkot Mandi", price: 6400, unit: "Quintal", date: new Date() },
-      { crop: "Bajra", state: "Rajasthan", district: "Jaipur", market: "Jaipur Mandi", price: 1850, unit: "Quintal", date: new Date() }
-    ];
-  };
+
+  /* -------------------------------------------------------------
+     RESET + SYNC DATA
+  -------------------------------------------------------------- */
 
   const handleResetFilters = () => {
     setSelectedState("");
     setSelectedDistrict("");
     setSelectedCrop("");
     setSelectedMarket("");
-    setSelectedDate(new Date().toISOString().split('T')[0]);
+    setSelectedDate(new Date().toISOString().split("T")[0]);
   };
 
-  const formatDate = (dateString) => {
-    if (!dateString) return "N/A";
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-IN", {
-      year: "numeric",
-      month: "long",
+  const handleSyncRealtime = async () => {
+    try {
+      setIsSyncing(true);
+
+      const body = {};
+      if (selectedState) body.state = selectedState;
+      if (selectedDistrict) body.district = selectedDistrict;
+      if (selectedCrop) body.crop = selectedCrop;
+
+      const res = await fetch(`${API_URL}/api/market/sync-realtime`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      const json = await res.json();
+
+      setSyncMessage(
+        json.success ? `Data Synced: ${json.message}` : `Sync Failed: ${json.message}`
+      );
+
+      if (json.success) setTimeout(fetchMarketPrices, 1000);
+    } catch {
+      setSyncMessage("Error syncing data.");
+    } finally {
+      setIsSyncing(false);
+      setTimeout(() => setSyncMessage(null), 5000);
+    }
+  };
+
+
+  /* -------------------------------------------------------------
+     UTILITIES
+  -------------------------------------------------------------- */
+
+  const formatDate = (date) =>
+    new Date(date).toLocaleDateString("en-IN", {
       day: "numeric",
+      month: "long",
+      year: "numeric",
     });
-  };
 
-  const formatTime = (date) => {
-    if (!date) return "";
-    return date.toLocaleTimeString("en-IN", {
+  const formatTime = (date) =>
+    new Date(date).toLocaleTimeString("en-IN", {
       hour: "2-digit",
       minute: "2-digit",
     });
+
+
+  /* -------------------------------------------------------------
+     CHART COLORS
+  -------------------------------------------------------------- */
+
+  const colors = [
+    "#4E7C32", "#A7D129", "#FF6B6B", "#4ECDC4", "#45B7D1",
+    "#FFA07A", "#98D8C8", "#F7DC6F", "#BB8FCE", "#85C1E2",
+    "#F8B739", "#52BE80", "#E74C3C", "#9B59B6", "#3498DB"
+  ];
+
+  const getColor = (text) => {
+    let hash = 0;
+    for (let i = 0; i < text.length; i++) {
+      hash = text.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return colors[Math.abs(hash) % colors.length];
   };
 
-  const chartData = prices.map((item) => ({
-    name: item.crop,
-    price: item.price,
-    market: item.market,
+
+  /* -------------------------------------------------------------
+     PREPARE CHART DATA
+  -------------------------------------------------------------- */
+
+  const filtered = selectedCropFromLegend
+    ? prices.filter((p) => p.crop === selectedCropFromLegend)
+    : prices;
+
+  const chartData = filtered.map((p) => ({
+    name: p.crop,
+    price: p.price,
+    color: getColor(p.crop),
   }));
+
+  const uniqueCrops = [...new Set(prices.map((p) => p.crop))].map((crop) => ({
+    name: crop,
+    color: getColor(crop),
+  }));
+
+
+  /* -------------------------------------------------------------
+     UI RENDER
+  -------------------------------------------------------------- */
 
   return (
     <div className="market-container">
+
+      {/* Header */}
       <div className="market-header">
-        <div className="header-content">
-          <h1>🌾 Real-Time Market Prices</h1>
-          <p>Get live mandi prices filtered by state, district, and crop</p>
-          {autoRefresh && (
-            <div className="realtime-banner">
-              <span className="pulse-dot"></span>
-              <span>Real-time prices updating every 30 seconds</span>
-            </div>
-          )}
-        </div>
+        {/* <h1>Real-Time Market Prices</h1>
+        <p>Get live mandi prices filtered by various parameters</p> */}
+
+        {autoRefresh && (
+          <div className="realtime-banner">
+            <span className="pulse-dot"></span>
+            Updating every 30 seconds
+          </div>
+        )}
       </div>
 
-      {/* Filters Section */}
+      {/* ---------------- FILTERS SECTION ---------------- */}
       <div className="filters-section">
+
         <div className="filters-grid">
           <div className="filter-group">
-            <label htmlFor="date-filter">📅 Select Date</label>
+            <label>Date</label>
             <input
               type="date"
-              id="date-filter"
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
-              max={new Date().toISOString().split('T')[0]}
               className="filter-input"
+              max={new Date().toISOString().split("T")[0]}
             />
           </div>
 
           <div className="filter-group">
-            <label htmlFor="state-filter">🗺️ State</label>
+            <label>State</label>
             <select
-              id="state-filter"
               value={selectedState}
               onChange={(e) => setSelectedState(e.target.value)}
               className="filter-select"
             >
               <option value="">All States</option>
-              {states.map((state, index) => (
-                <option key={index} value={state}>
-                  {state}
-                </option>
+              {states.map((s, i) => (
+                <option key={i}>{s}</option>
               ))}
             </select>
           </div>
 
           <div className="filter-group">
-            <label htmlFor="district-filter">📍 District</label>
+            <label>District</label>
             <select
-              id="district-filter"
               value={selectedDistrict}
               onChange={(e) => setSelectedDistrict(e.target.value)}
-              className="filter-select"
               disabled={!selectedState}
+              className="filter-select"
             >
               <option value="">All Districts</option>
-              {districts.map((district, index) => (
-                <option key={index} value={district}>
-                  {district}
-                </option>
+              {districts.map((d, i) => (
+                <option key={i}>{d}</option>
               ))}
             </select>
           </div>
 
           <div className="filter-group">
-            <label htmlFor="crop-filter">🌾 Crop</label>
+            <label>Crop</label>
             <select
-              id="crop-filter"
               value={selectedCrop}
               onChange={(e) => setSelectedCrop(e.target.value)}
               className="filter-select"
             >
               <option value="">All Crops</option>
-              {crops.map((crop, index) => (
-                <option key={index} value={crop}>
-                  {crop}
-                </option>
+              {crops.map((c, i) => (
+                <option key={i}>{c}</option>
               ))}
             </select>
           </div>
 
           <div className="filter-group">
-            <label htmlFor="market-filter">🏪 Market</label>
+            <label>Market</label>
             <select
-              id="market-filter"
               value={selectedMarket}
               onChange={(e) => setSelectedMarket(e.target.value)}
               className="filter-select"
               disabled={!selectedState}
             >
               <option value="">All Markets</option>
-              {markets.map((market, index) => (
-                <option key={index} value={market}>
-                  {market}
-                </option>
+              {markets.map((m, i) => (
+                <option key={i}>{m}</option>
               ))}
             </select>
           </div>
         </div>
 
+        {/* Action Buttons */}
         <div className="filter-actions">
-          <button onClick={handleResetFilters} className="btn-reset">
-            🔄 Reset Filters
+          <button className="btn-reset" onClick={handleResetFilters}>
+            Reset Filters
           </button>
-          <button 
-            onClick={fetchMarketPrices} 
+
+          <button
             className="btn-refresh"
+            onClick={fetchMarketPrices}
             disabled={isRefreshing}
           >
-            {isRefreshing ? "🔄 Refreshing..." : "🔃 Refresh Now"}
+            {isRefreshing ? "Refreshing..." : "Refresh"}
           </button>
+
+          <button
+            className="btn-sync"
+            onClick={handleSyncRealtime}
+            disabled={isSyncing}
+          >
+            {isSyncing ? "Syncing..." : "Sync Live Data"}
+          </button>
+
           <label className="auto-refresh-toggle">
             <input
               type="checkbox"
               checked={autoRefresh}
               onChange={(e) => setAutoRefresh(e.target.checked)}
             />
-            <span>Auto-refresh (30s)</span>
+            Auto Refresh (30s)
           </label>
         </div>
 
-        {/* Active Filters Display */}
-        {(selectedState || selectedDistrict || selectedCrop || selectedMarket) && (
+        {syncMessage && (
+          <div className="sync-message">{syncMessage}</div>
+        )}
+
+        {(selectedState ||
+          selectedDistrict ||
+          selectedCrop ||
+          selectedMarket) && (
           <div className="active-filters">
-            <span className="active-filters-label">Active Filters:</span>
-            {selectedState && (
-              <span className="filter-badge">
-                🗺️ State: <strong>{selectedState}</strong>
-              </span>
-            )}
-            {selectedDistrict && (
-              <span className="filter-badge">
-                📍 District: <strong>{selectedDistrict}</strong>
-              </span>
-            )}
-            {selectedCrop && (
-              <span className="filter-badge">
-                🌾 Crop: <strong>{selectedCrop}</strong>
-              </span>
-            )}
-            {selectedMarket && (
-              <span className="filter-badge">
-                🏪 Market: <strong>{selectedMarket}</strong>
-              </span>
-            )}
+            {selectedState && <span className="filter-badge">State: {selectedState}</span>}
+            {selectedDistrict && <span className="filter-badge">District: {selectedDistrict}</span>}
+            {selectedCrop && <span className="filter-badge">Crop: {selectedCrop}</span>}
+            {selectedMarket && <span className="filter-badge">Market: {selectedMarket}</span>}
           </div>
         )}
 
         {lastUpdated && (
           <div className="last-updated">
-            <span className="live-indicator">
-              <span className="pulse-dot"></span>
-              Live Prices
-            </span>
-            Last updated: {formatTime(lastUpdated)} | Showing prices for: {formatDate(selectedDate)}
+            Last updated at {formatTime(lastUpdated)} | Showing prices for {formatDate(selectedDate)}
           </div>
         )}
       </div>
 
-      {/* Loading State */}
+      {/* ---------------- LOADING ---------------- */}
       {loading && (
         <div className="loading-state">
           <div className="spinner"></div>
@@ -396,172 +452,156 @@ const Market = () => {
         </div>
       )}
 
-      {/* Results */}
-      {!loading && (
-        <>
-          {prices.length === 0 ? (
-            <div className="no-data">
-              <p>📭 No market prices found for the selected filters.</p>
-              <p>Try adjusting your filters or select a different date.</p>
+      {/* ---------------- RESULTS ---------------- */}
+      {!loading &&
+        (prices.length === 0 ? (
+          <div className="no-data">
+            <p>No market prices found for selected filters.</p>
+          </div>
+        ) : (
+          <>
+            {/* Summary */}
+            <div className="summary-cards">
+              <div className="summary-card">
+                <div className="summary-label">Total Records</div>
+                <div className="summary-value">{prices.length}</div>
+              </div>
+
+              <div className="summary-card">
+                <div className="summary-label">Average Price</div>
+                <div className="summary-value">
+                  ₹
+                  {Math.round(
+                    prices.reduce((a, b) => a + b.price, 0) / prices.length
+                  )}
+                </div>
+              </div>
+
+              <div className="summary-card">
+                <div className="summary-label">Highest Price</div>
+                <div className="summary-value">
+                  ₹{Math.max(...prices.map((p) => p.price))}
+                </div>
+              </div>
             </div>
-          ) : (
-            <>
-              {/* Summary Cards */}
-              <div className="summary-cards">
-                <div className="summary-card">
-                  <div className="summary-icon">📊</div>
-                  <div className="summary-content">
-                    <div className="summary-label">Total Records</div>
-                    <div className="summary-value">{prices.length}</div>
-                  </div>
-                </div>
-                <div className="summary-card">
-                  <div className="summary-icon">💰</div>
-                  <div className="summary-content">
-                    <div className="summary-label">Avg Price</div>
-                    <div className="summary-value">
-                      ₹{Math.round(prices.reduce((sum, p) => sum + p.price, 0) / prices.length)}
-                    </div>
-                  </div>
-                </div>
-                <div className="summary-card">
-                  <div className="summary-icon">📈</div>
-                  <div className="summary-content">
-                    <div className="summary-label">Highest Price</div>
-                    <div className="summary-value">
-                      ₹{Math.max(...prices.map((p) => p.price))}
-                    </div>
-                  </div>
-                </div>
-                {selectedState && (
-                  <div className="summary-card highlight-card">
-                    <div className="summary-icon">🗺️</div>
-                    <div className="summary-content">
-                      <div className="summary-label">Selected State</div>
-                      <div className="summary-value">{selectedState}</div>
-                    </div>
-                  </div>
-                )}
-                {selectedDistrict && (
-                  <div className="summary-card highlight-card">
-                    <div className="summary-icon">📍</div>
-                    <div className="summary-content">
-                      <div className="summary-label">Selected District</div>
-                      <div className="summary-value">{selectedDistrict}</div>
-                    </div>
-                  </div>
-                )}
-                {selectedCrop && (
-                  <div className="summary-card highlight-card">
-                    <div className="summary-icon">🌾</div>
-                    <div className="summary-content">
-                      <div className="summary-label">Selected Crop</div>
-                      <div className="summary-value">{selectedCrop}</div>
-                    </div>
-                  </div>
-                )}
-                {selectedMarket && (
-                  <div className="summary-card highlight-card">
-                    <div className="summary-icon">🏪</div>
-                    <div className="summary-content">
-                      <div className="summary-label">Selected Market</div>
-                      <div className="summary-value">{selectedMarket}</div>
-                    </div>
-                  </div>
-                )}
-              </div>
 
-              {/* Price Table */}
-              <div className="table-wrapper">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Crop</th>
-                      <th>State</th>
-                      <th>District</th>
-                      <th>Market</th>
-                      <th>Price (₹/{prices[0]?.unit || "Quintal"})</th>
-                      <th>Date</th>
+            {/* Table */}
+            <div className="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Crop</th>
+                    <th>State</th>
+                    <th>District</th>
+                    <th>Market</th>
+                    <th>Price</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {prices.map((item, index) => (
+                    <tr key={index}>
+                      <td>{item.crop}</td>
+                      <td>{item.state}</td>
+                      <td>{item.district}</td>
+                      <td>{item.market}</td>
+                      <td>
+                        ₹{item.price.toLocaleString("en-IN")}
+                      </td>
+                      <td>{formatDate(item.date)}</td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {prices.map((item, index) => (
-                      <tr key={index} className="price-row">
-                        <td className="crop-cell">
-                          <div className="cell-content">
-                            <span className="crop-icon">🌾</span>
-                            <strong>{item.crop}</strong>
-                          </div>
-                        </td>
-                        <td className="state-cell">
-                          <div className="cell-content">
-                            <span className="state-icon">🗺️</span>
-                            {item.state}
-                          </div>
-                        </td>
-                        <td className="district-cell">
-                          <div className="cell-content">
-                            <span className="district-icon">📍</span>
-                            {item.district}
-                          </div>
-                        </td>
-                        <td className="market-cell">{item.market}</td>
-                        <td className="price-cell">
-                          <div className="price-display">
-                            <span className="price-value">₹{item.price.toLocaleString('en-IN')}</span>
-                            <span className="price-unit">/{item.unit || "Quintal"}</span>
-                            <span className="live-price-badge">LIVE</span>
-                          </div>
-                        </td>
-                        <td className="date-cell">{formatDate(item.date)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Charts */}
+            <div className="charts-section">
+              <div className="chart-card">
+                <h3>Price Comparison by Crop</h3>
+
+                <ResponsiveContainer width="100%" height={350}>
+                  <BarChart data={chartData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip />
+                    <Bar dataKey="price" radius={[6, 6, 0, 0]}>
+                      {chartData.map((entry, index) => (
+                        <Cell key={index} fill={entry.color} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
               </div>
 
-              {/* Charts */}
-              <div className="charts-section">
-                <div className="chart-card">
-                  <h3>📊 Price Comparison by Crop</h3>
-                  <ResponsiveContainer width="100%" height={350}>
-                    <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="name" />
-                      <YAxis />
-                      <Tooltip 
-                        formatter={(value) => [`₹${value.toLocaleString('en-IN')}`, 'Price']}
-                      />
-                      <Bar dataKey="price" fill="#4E7C32" radius={[8, 8, 0, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
+              <div className="chart-card">
+                <h3>Price Trend</h3>
 
-                <div className="chart-card">
-                  <h3>📈 Price Trend</h3>
-                  <ResponsiveContainer width="100%" height={350}>
-                    <LineChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="name" />
-                      <YAxis />
-                      <Tooltip 
-                        formatter={(value) => [`₹${value.toLocaleString('en-IN')}`, 'Price']}
-                      />
-                      <Line 
-                        type="monotone" 
-                        dataKey="price" 
-                        stroke="#A7D129" 
-                        strokeWidth={3}
-                        dot={{ fill: '#4E7C32', r: 6 }}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
+                <ResponsiveContainer width="100%" height={350}>
+                  <LineChart data={chartData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+
+                    <Line
+                      dataKey="price"
+                      stroke="#4E7C32"
+                      strokeWidth={3}
+                      dot={(props) => (
+                        <circle
+                          cx={props.cx}
+                          cy={props.cy}
+                          r={6}
+                          fill={props.payload.color}
+                          stroke="#fff"
+                          strokeWidth={2}
+                        />
+                      )}
+                      activeDot={{ r: 8 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+
+                {/* Crop Legend */}
+                <div className="crop-color-legend">
+                  <h4>
+                    Crop Colors{" "}
+                    {selectedCropFromLegend &&
+                      `(Filtered: ${selectedCropFromLegend})`}
+                  </h4>
+
+                  <div className="legend-items">
+                    {uniqueCrops.map((item, index) => {
+                      const active = item.name === selectedCropFromLegend;
+                      return (
+                        <div
+                          key={index}
+                          className={`legend-item ${active ? "selected" : ""}`}
+                          onClick={() =>
+                            setSelectedCropFromLegend(
+                              active ? null : item.name
+                            )
+                          }
+                        >
+                          <span
+                            className="legend-color-dot"
+                            style={{ backgroundColor: item.color }}
+                          ></span>
+                          {item.name}
+                          {active && <span className="checkmark">✓</span>}
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
-            </>
-          )}
-        </>
-      )}
+            </div>
+          </>
+        ))}
     </div>
   );
 };

@@ -14,24 +14,29 @@ router.get('/', async (req, res) => {
     // If useRealtime is true, try to fetch from external API first
     if (useRealtime === 'true') {
       try {
+        console.log('🔄 Attempting to fetch real-time data from external API...');
         // Build params object, only including defined and non-empty values
         const realtimeParams = {};
         if (state && state.trim()) realtimeParams.state = state.trim();
         if (district && district.trim()) realtimeParams.district = district.trim();
         if (crop && crop.trim()) realtimeParams.crop = crop.trim();
         if (market && market.trim()) realtimeParams.market = market.trim();
+        realtimeParams.limit = 100; // Ensure we get enough results
         
         const realtimeData = await getRealTimeData(realtimeParams);
         if (realtimeData && realtimeData.length > 0) {
+          console.log(`✅ Successfully fetched ${realtimeData.length} records from external API`);
           return res.status(200).json({
             success: true,
             count: realtimeData.length,
             data: realtimeData,
             source: 'external_api',
           });
+        } else {
+          console.log('⚠️ External API returned no data, falling back to database');
         }
       } catch (error) {
-        console.error('Error fetching real-time data, falling back to database:', error.message);
+        console.error('❌ Error fetching real-time data, falling back to database:', error.message);
         // Fall through to database query
       }
     }
@@ -71,15 +76,38 @@ router.get('/', async (req, res) => {
       query.date = { $gte: today, $lt: tomorrow };
     }
 
-    const prices = await MarketPrice.find(query)
+    let prices = await MarketPrice.find(query)
       .sort({ date: -1, price: -1 })
       .limit(100);
+
+    // If no prices found for the requested date and no specific date was requested,
+    // try to get recent data (last 7 days) as fallback
+    if (prices.length === 0 && !date) {
+      console.log('No prices found for today, fetching recent data (last 7 days)...');
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+      sevenDaysAgo.setHours(0, 0, 0, 0);
+      
+      // Remove date filter to get recent data
+      const recentQuery = { ...query };
+      delete recentQuery.date;
+      recentQuery.date = { $gte: sevenDaysAgo };
+      
+      prices = await MarketPrice.find(recentQuery)
+        .sort({ date: -1, price: -1 })
+        .limit(100);
+      
+      if (prices.length > 0) {
+        console.log(`Found ${prices.length} recent prices (last 7 days)`);
+      }
+    }
 
     res.status(200).json({
       success: true,
       count: prices.length,
       data: prices,
       source: 'database',
+      message: prices.length === 0 ? 'No market prices found. Try syncing real-time data or check back later.' : undefined,
     });
   } catch (error) {
     console.error('Get market prices error:', error);
