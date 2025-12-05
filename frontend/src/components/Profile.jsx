@@ -69,11 +69,34 @@ const Profile = () => {
     setIsEditing(!isEditing);
   };
 
-  const handleSave = () => {
-    // Frontend-only demo save
-    setUser({ ...user, name: editData.name, email: editData.email });
-    setIsEditing(false);
-    alert("Profile updated successfully! (Frontend only)");
+  const handleSave = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        navigate("/login");
+        return;
+      }
+
+      const response = await fetch(`${API_URL}/api/user/me`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(editData),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to update profile");
+      }
+
+      setUser({ ...user, name: data.user.name, email: data.user.email });
+      setIsEditing(false);
+      setError("");
+    } catch (err) {
+      setError(err.message || "Failed to update profile");
+    }
   };
 
   if (loading)

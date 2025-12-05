@@ -26,15 +26,47 @@ const CropHealth = () => {
       <h1>🌾 Crop Health Detection</h1>
       <p>Upload a photo of your crop leaf and get AI-based diagnosis (demo).</p>
 
-      <input type="file" accept="image/*" onChange={handleImageChange} />
-      {preview && <img src={preview} alt="Preview" className="preview" />}
+      <div className="upload-area-wrapper">
+        <input 
+          type="file" 
+          id="image-upload"
+          accept="image/*" 
+          onChange={handleImageChange}
+        />
+        <label htmlFor="image-upload" className="file-upload-label">
+          <span className="upload-icon">📸</span>
+          <span className="upload-text">
+            {selectedImage ? "Change Image" : "Click to Upload Image"}
+          </span>
+          <span className="upload-subtext">
+            {selectedImage ? selectedImage.name : "PNG, JPG, JPEG up to 10MB"}
+          </span>
+        </label>
+        {selectedImage && (
+          <div className="file-name">✓ {selectedImage.name}</div>
+        )}
+      </div>
 
-      <button onClick={handleAnalyze}>Analyze</button>
+      {preview && (
+        <div className="preview-wrapper">
+          <img src={preview} alt="Preview" className="preview" />
+        </div>
+      )}
+
+      <button onClick={handleAnalyze} disabled={!selectedImage}>
+        {selectedImage ? "🔍 Analyze Crop Health" : "Please Upload an Image First"}
+      </button>
 
       {result && (
         <div className="result-card">
-          <h2>Disease Detected: {result.disease}</h2>
-          <p><strong>Treatment:</strong> {result.treatment}</p>
+          <h2>
+            Analysis Result
+            <span className="disease-badge">{result.disease}</span>
+          </h2>
+          <div className="treatment-section">
+            <strong>💊 Treatment Recommendation</strong>
+            <p>{result.treatment}</p>
+          </div>
         </div>
       )}
     </div>

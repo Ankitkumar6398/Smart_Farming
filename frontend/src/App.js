@@ -9,6 +9,8 @@ import Footer from "./components/Footer";
 import Schemes from "./components/Schemes";
 import Profile from "./components/Profile"
 import Community from "./components/Community";
+import Login from "./components/Login";
+import Register from "./components/Register";
 
 
 function App() {
@@ -23,8 +25,8 @@ function App() {
         <Route path="/schemes" element={<Schemes />} />
         <Route path="/community" element={<Community />} />
         <Route path="/profile" element={<Profile />} />
-
-        
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
       </Routes>
       <Footer/>
     </Router>

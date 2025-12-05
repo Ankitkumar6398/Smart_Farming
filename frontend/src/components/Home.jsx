@@ -1,9 +1,65 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/Home.css";
 
 const Home = () => {
   const navigate = useNavigate();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    // Check if user is authenticated
+    const token = localStorage.getItem("token");
+    setIsAuthenticated(!!token);
+
+    // Fetch user data if authenticated
+    if (token) {
+      fetchUserData(token);
+    }
+
+    // Listen for auth changes (login/logout)
+    const handleAuthChange = () => {
+      const newToken = localStorage.getItem("token");
+      setIsAuthenticated(!!newToken);
+      if (newToken) {
+        fetchUserData(newToken);
+      } else {
+        setUser(null);
+      }
+    };
+
+    // Listen for storage changes (login/logout in other tabs)
+    window.addEventListener('storage', handleAuthChange);
+    
+    // Listen for custom auth-change event (login/logout in same tab)
+    window.addEventListener('auth-change', handleAuthChange);
+    
+    // Also check on focus (in case login happened in another tab)
+    window.addEventListener('focus', handleAuthChange);
+
+    return () => {
+      window.removeEventListener('storage', handleAuthChange);
+      window.removeEventListener('auth-change', handleAuthChange);
+      window.removeEventListener('focus', handleAuthChange);
+    };
+  }, []);
+
+  const fetchUserData = async (token) => {
+    try {
+      const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+      const response = await fetch(`${API_URL}/api/auth/me`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setUser(data.user);
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  };
 
   // fix crop.png image: ensure correct path and fallback
   // Set correct public path for crop image (public/images/crop.png)
@@ -75,12 +131,22 @@ const Home = () => {
           </div>
 
           <h1 className="hero-title">
-            Smart Farming
-            <span className="gradient-text"> Revolution</span>
+            {isAuthenticated && user ? (
+              <>
+                Welcome back, <span className="gradient-text">{user.name}</span>! 👋
+              </>
+            ) : (
+              <>
+                Smart Farming
+                <span className="gradient-text"> Revolution</span>
+              </>
+            )}
           </h1>
 
           <p className="hero-subtitle">
-            Real-time insights, disease detection, and data-driven recommendations for farmers.
+            {isAuthenticated && user
+              ? "Continue managing your farm with AI-powered tools and insights."
+              : "Real-time insights, disease detection, and data-driven recommendations for farmers."}
           </p>
 
           <div className="hero-stats">
@@ -100,11 +166,18 @@ const Home = () => {
 
           <div className="hero-buttons">
             <button className="btn-primary-hero" onClick={() => navigate("/crop-health")}>
-              Get Started
+              {isAuthenticated ? "Explore Features" : "Get Started"}
             </button>
-            <button className="btn-secondary-hero" onClick={() => navigate("/register")}>
-              Sign Up Free
-            </button>
+            {!isAuthenticated && (
+              <button className="btn-secondary-hero" onClick={() => navigate("/register")}>
+                Sign Up Free
+              </button>
+            )}
+            {isAuthenticated && (
+              <button className="btn-secondary-hero" onClick={() => navigate("/profile")}>
+                View Profile
+              </button>
+            )}
           </div>
         </div>
 
