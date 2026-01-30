@@ -3,6 +3,15 @@ import "../styles/Community.css";
 
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
+const userBadgeStyle = {
+  padding: "0.75rem 1rem",
+  background: "#f0faf3",
+  borderRadius: "8px",
+  border: "2px solid #d5ebd7",
+  color: "#3e8f51",
+  fontWeight: "500",
+};
+
 const parseJSONResponse = async (response) => {
   const contentType = response.headers.get("content-type");
   if (!contentType || !contentType.includes("application/json")) {
@@ -28,22 +37,37 @@ const Community = () => {
   const [newReplies, setNewReplies] = useState({});
   const [showReplyForms, setShowReplyForms] = useState({});
 
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem("token");
+    return {
+      "Content-Type": "application/json",
+      ...(token && { Authorization: `Bearer ${token}` }),
+    };
+  };
+
+  const apiPost = async (url, body) => {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: getAuthHeaders(),
+      body: JSON.stringify(body),
+    });
+    const data = await parseJSONResponse(response);
+    if (!response.ok) throw new Error(data.message || "Request failed");
+    return data;
+  };
+
   useEffect(() => {
     fetchUserData();
     fetchQuestions();
   }, []);
 
   useEffect(() => {
-    const handleAuthChange = () => {
-      fetchUserData();
-    };
-
-    window.addEventListener('auth-change', handleAuthChange);
-    window.addEventListener('storage', handleAuthChange);
-
+    const handleAuthChange = () => fetchUserData();
+    window.addEventListener("auth-change", handleAuthChange);
+    window.addEventListener("storage", handleAuthChange);
     return () => {
-      window.removeEventListener('auth-change', handleAuthChange);
-      window.removeEventListener('storage', handleAuthChange);
+      window.removeEventListener("auth-change", handleAuthChange);
+      window.removeEventListener("storage", handleAuthChange);
     };
   }, []);
 
@@ -55,18 +79,13 @@ const Community = () => {
         setNewPost({ name: "", question: "" });
         return;
       }
-
       const response = await fetch(`${API_URL}/api/user/me`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
       });
-
       if (response.ok) {
         const data = await response.json();
         setUser(data.user);
-        setNewPost(prev => ({ ...prev, name: data.user?.name || "" }));
+        setNewPost((prev) => ({ ...prev, name: data.user?.name || "" }));
       } else {
         setUser(null);
         setNewPost({ name: "", question: "" });
@@ -82,11 +101,7 @@ const Community = () => {
       setLoading(true);
       const response = await fetch(`${API_URL}/api/community/questions`);
       const data = await parseJSONResponse(response);
-
-      if (!response.ok) {
-        throw new Error(data.message || "Failed to fetch questions");
-      }
-
+      if (!response.ok) throw new Error(data.message || "Failed to fetch questions");
       setQuestions(data.data || []);
       setError("");
     } catch (err) {
@@ -99,34 +114,16 @@ const Community = () => {
 
   const handlePost = async () => {
     const userName = user?.name || newPost.name;
-    
     if (!userName || !newPost.question) {
       alert(user ? "Please enter your question!" : "Please enter your name and question!");
       return;
     }
-
     try {
       setPosting(true);
-      const token = localStorage.getItem("token");
-      
-      const response = await fetch(`${API_URL}/api/community/questions`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token && { Authorization: `Bearer ${token}` }),
-        },
-        body: JSON.stringify({
-          userName: user?.name || newPost.name,
-          question: newPost.question,
-        }),
+      await apiPost(`${API_URL}/api/community/questions`, {
+        userName: user?.name || newPost.name,
+        question: newPost.question,
       });
-
-      const data = await parseJSONResponse(response);
-
-      if (!response.ok) {
-        throw new Error(data.message || "Failed to post question");
-      }
-
       await fetchQuestions();
       setNewPost({ name: user?.name || "", question: "" });
       alert("Question posted successfully!");
@@ -141,127 +138,83 @@ const Community = () => {
   const handleAnswer = async (questionId) => {
     const answerData = newAnswers[questionId];
     const userName = user?.name || answerData?.name;
-    
     if (!userName || !answerData?.answer) {
       alert(user ? "Please enter your answer!" : "Please enter your name and answer!");
       return;
     }
-
     try {
-      setAnswering({ ...answering, [questionId]: true });
-      const token = localStorage.getItem("token");
-
-      const response = await fetch(
-        `${API_URL}/api/community/questions/${questionId}/answers`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            ...(token && { Authorization: `Bearer ${token}` }),
-          },
-          body: JSON.stringify({
-            userName: user?.name || answerData.name,
-            answer: answerData.answer,
-          }),
-        }
-      );
-
-      const data = await parseJSONResponse(response);
-
-      if (!response.ok) {
-        throw new Error(data.message || "Failed to post answer");
-      }
-
+      setAnswering((prev) => ({ ...prev, [questionId]: true }));
+      await apiPost(`${API_URL}/api/community/questions/${questionId}/answers`, {
+        userName: user?.name || answerData.name,
+        answer: answerData.answer,
+      });
       await fetchQuestions();
-      setNewAnswers({ ...newAnswers, [questionId]: { name: user?.name || "", answer: "" } });
+      setNewAnswers((prev) => ({ ...prev, [questionId]: { name: user?.name || "", answer: "" } }));
       alert("Answer posted successfully!");
     } catch (err) {
       console.error("Error posting answer:", err);
       alert(err.message || "Failed to post answer");
     } finally {
-      setAnswering({ ...answering, [questionId]: false });
+      setAnswering((prev) => ({ ...prev, [questionId]: false }));
     }
   };
 
   const handleAnswerChange = (questionId, field, value) => {
-    setNewAnswers({
-      ...newAnswers,
-      [questionId]: {
-        ...newAnswers[questionId],
-        [field]: value,
-      },
-    });
+    setNewAnswers((prev) => ({
+      ...prev,
+      [questionId]: { ...prev[questionId], [field]: value },
+    }));
   };
 
   const handleReply = async (questionId, answerId) => {
-    const replyData = newReplies[`${questionId}-${answerId}`];
+    const key = `${questionId}-${answerId}`;
+    const replyData = newReplies[key];
     const userName = user?.name || replyData?.name;
-    
     if (!userName || !replyData?.reply) {
       alert(user ? "Please enter your reply!" : "Please enter your name and reply!");
       return;
     }
-
     try {
-      setReplying({ ...replying, [`${questionId}-${answerId}`]: true });
-      const token = localStorage.getItem("token");
-
-      const response = await fetch(
+      setReplying((prev) => ({ ...prev, [key]: true }));
+      await apiPost(
         `${API_URL}/api/community/questions/${questionId}/answers/${answerId}/replies`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            ...(token && { Authorization: `Bearer ${token}` }),
-          },
-          body: JSON.stringify({
-            userName: user?.name || replyData.name,
-            reply: replyData.reply,
-          }),
-        }
+        { userName: user?.name || replyData.name, reply: replyData.reply }
       );
-
-      const data = await parseJSONResponse(response);
-
-      if (!response.ok) {
-        throw new Error(data.message || "Failed to post reply");
-      }
-
       await fetchQuestions();
-      setNewReplies({ ...newReplies, [`${questionId}-${answerId}`]: { name: user?.name || "", reply: "" } });
-      setShowReplyForms({ ...showReplyForms, [`${questionId}-${answerId}`]: false });
+      setNewReplies((prev) => ({ ...prev, [key]: { name: user?.name || "", reply: "" } }));
+      setShowReplyForms((prev) => ({ ...prev, [key]: false }));
       alert("Reply posted successfully!");
     } catch (err) {
       console.error("Error posting reply:", err);
       alert(err.message || "Failed to post reply");
     } finally {
-      setReplying({ ...replying, [`${questionId}-${answerId}`]: false });
+      setReplying((prev) => ({ ...prev, [key]: false }));
     }
   };
 
   const handleReplyChange = (questionId, answerId, field, value) => {
-    setNewReplies({
-      ...newReplies,
-      [`${questionId}-${answerId}`]: {
-        ...newReplies[`${questionId}-${answerId}`],
-        [field]: value,
-      },
-    });
+    const key = `${questionId}-${answerId}`;
+    setNewReplies((prev) => ({
+      ...prev,
+      [key]: { ...prev[key], [field]: value },
+    }));
   };
 
   const toggleReplyForm = (questionId, answerId) => {
     const key = `${questionId}-${answerId}`;
-    setShowReplyForms({
-      ...showReplyForms,
-      [key]: !showReplyForms[key],
-    });
-    if (!showReplyForms[key] && user) {
-      setNewReplies({
-        ...newReplies,
-        [key]: { name: user.name, reply: "" },
-      });
+    const willShow = !showReplyForms[key];
+    setShowReplyForms((prev) => ({ ...prev, [key]: willShow }));
+    if (willShow && user) {
+      setNewReplies((prev) => ({ ...prev, [key]: { name: user.name, reply: "" } }));
     }
   };
+
+  const renderUserBadge = (label, styleOverride = {}) =>
+    user ? (
+      <div style={{ ...userBadgeStyle, ...styleOverride }}>
+        👤 {label}: <strong>{user.name}</strong>
+      </div>
+    ) : null;
 
 
   return (
@@ -271,9 +224,7 @@ const Community = () => {
 
       <div className="post-form">
         {user ? (
-          <div style={{ padding: "0.9rem 1.25rem", background: "#f0faf3", borderRadius: "10px", border: "2px solid #d5ebd7", color: "#3e8f51", fontWeight: "500" }}>
-            👤 Posting as: <strong>{user.name}</strong>
-          </div>
+          renderUserBadge("Posting as", { padding: "0.9rem 1.25rem" })
         ) : (
           <input
             type="text"
@@ -323,7 +274,9 @@ const Community = () => {
                   {question.answers && question.answers.length > 0 ? (
                     <>
                       <h4>💡 Answers ({question.answers.length}):</h4>
-                      {question.answers.map((answer, idx) => (
+                      {question.answers.map((answer, idx) => {
+                        const replyKey = `${question._id}-${answer._id}`;
+                        return (
                         <div key={answer._id || idx} className="answer-card">
                           <div className="answer-header">
                             <strong>{answer.userName}</strong>
@@ -356,38 +309,32 @@ const Community = () => {
                             💬 Reply
                           </button>
 
-                          {showReplyForms[`${question._id}-${answer._id}`] && (
+                          {showReplyForms[replyKey] && (
                             <div className="reply-form">
-                              {user ? (
-                                <div style={{ padding: "0.75rem 1rem", background: "#f0faf3", borderRadius: "8px", border: "2px solid #d5ebd7", color: "#3e8f51", fontSize: "0.9rem", fontWeight: "500", marginBottom: "0.5rem" }}>
-                                  👤 Replying as: <strong>{user.name}</strong>
-                                </div>
-                              ) : (
-                                <input
-                                  type="text"
-                                  placeholder="Your Name"
-                                  value={newReplies[`${question._id}-${answer._id}`]?.name || ""}
-                                  onChange={(e) =>
-                                    handleReplyChange(question._id, answer._id, "name", e.target.value)
-                                  }
-                                  style={{ marginBottom: "0.5rem" }}
-                                />
-                              )}
+                              {user
+                                ? renderUserBadge("Replying as", { marginBottom: "0.5rem", fontSize: "0.9rem" })
+                                : (
+                                  <input
+                                    type="text"
+                                    placeholder="Your Name"
+                                    value={newReplies[replyKey]?.name || ""}
+                                    onChange={(e) => handleReplyChange(question._id, answer._id, "name", e.target.value)}
+                                    style={{ marginBottom: "0.5rem" }}
+                                  />
+                                )}
                               <textarea
                                 placeholder="Type your reply..."
-                                value={newReplies[`${question._id}-${answer._id}`]?.reply || ""}
-                                onChange={(e) =>
-                                  handleReplyChange(question._id, answer._id, "reply", e.target.value)
-                                }
+                                value={newReplies[replyKey]?.reply || ""}
+                                onChange={(e) => handleReplyChange(question._id, answer._id, "reply", e.target.value)}
                                 style={{ marginBottom: "0.5rem" }}
                               ></textarea>
                               <div style={{ display: "flex", gap: "0.5rem" }}>
                                 <button
                                   onClick={() => handleReply(question._id, answer._id)}
-                                  disabled={replying[`${question._id}-${answer._id}`]}
+                                  disabled={replying[replyKey]}
                                   className="reply-submit-button"
                                 >
-                                  {replying[`${question._id}-${answer._id}`] ? "Posting..." : "Post Reply"}
+                                  {replying[replyKey] ? "Posting..." : "Post Reply"}
                                 </button>
                                 <button
                                   onClick={() => toggleReplyForm(question._id, answer._id)}
@@ -399,7 +346,8 @@ const Community = () => {
                             </div>
                           )}
                         </div>
-                      ))}
+                        );
+                      })}
                     </>
                   ) : (
                     <p className="no-answers">No answers yet. Be the first to help!</p>
@@ -408,9 +356,7 @@ const Community = () => {
 
                 <div className="answer-form">
                   {user ? (
-                    <div style={{ padding: "0.75rem 1rem", background: "#f0faf3", borderRadius: "8px", border: "2px solid #d5ebd7", color: "#3e8f51", fontSize: "0.95rem", fontWeight: "500" }}>
-                      👤 Answering as: <strong>{user.name}</strong>
-                    </div>
+                    renderUserBadge("Answering as")
                   ) : (
                     <input
                       type="text"
