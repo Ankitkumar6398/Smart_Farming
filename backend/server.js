@@ -37,6 +37,12 @@ app.use('/api/user', require('./routes/user'));
 // Market routes
 app.use('/api/market', require('./routes/market'));
 
+// Weather routes
+app.use('/api/weather', require('./routes/weather'));
+
+// Community routes
+app.use('/api/community', require('./routes/community'));
+
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {

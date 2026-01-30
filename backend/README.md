@@ -31,6 +31,10 @@ JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
 # Market API Configuration (for real-time market prices)
 MARKET_API_KEY=579b464db66ec23bdd0000017e0bf52cad4d402f5c50c5bd578f6f93
 MARKET_API_BASE_URL=https://api.data.gov.in/resource/9ef84268-d588-465a-a308-a864a43d0070
+
+# Weather API Configuration (for weather forecasts)
+# Get your free API key from: https://openweathermap.org/api
+WEATHER_API_KEY=your-openweathermap-api-key-here
 ```
 
 ### 3. Start MongoDB
@@ -61,6 +65,9 @@ The server will start on `http://localhost:5000` (or the port specified in your 
 - `GET /api/health` - Health check endpoint (shows server and database status)
 - `POST /api/auth/register` - Register a new user
 - `POST /api/auth/login` - Login user
+- `GET /api/weather?city={city}&country={country}` - Get current weather by city
+- `GET /api/weather/coordinates?lat={lat}&lon={lon}` - Get current weather by coordinates
+- `GET /api/weather/forecast?city={city}&country={country}` - Get 5-day weather forecast
 
 ### Protected Endpoints (require authentication token)
 - `GET /api/auth/me` - Get current logged in user
@@ -83,7 +90,12 @@ backend/
 │   └── auth.js        # Authentication middleware
 ├── routes/
 │   ├── auth.js        # Authentication routes (register, login)
-│   └── user.js        # User routes (profile)
+│   ├── user.js        # User routes (profile)
+│   ├── market.js      # Market price routes
+│   └── weather.js     # Weather routes
+├── services/
+│   ├── marketApiService.js  # Market API service
+│   └── weatherService.js    # Weather API service
 ├── server.js           # Main server file
 ├── package.json        # Dependencies and scripts
 └── .env               # Environment variables (create this file)

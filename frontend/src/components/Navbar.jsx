@@ -52,6 +52,7 @@ const Navbar = () => {
         <li><Link to="/crop-health">Crop Health</Link></li>
         <li><Link to="/irrigation">Irrigation</Link></li>
         <li><Link to="/market">Market</Link></li>
+        <li><Link to="/weather">Weather</Link></li>
         <li><Link to="/community">Community</Link></li>
         <li><Link to="/schemes">Schemes</Link></li>
         {isAuthenticated ? (

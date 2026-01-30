@@ -9,6 +9,7 @@ import Footer from "./components/Footer";
 import Schemes from "./components/Schemes";
 import Profile from "./components/Profile"
 import Community from "./components/Community";
+import Weather from "./components/Weather";
 import Login from "./components/Login";
 import Register from "./components/Register";
 
@@ -22,6 +23,7 @@ function App() {
         <Route path="/crop-health" element={<CropHealth />} />
         <Route path="/irrigation" element={<Irrigation />} />
         <Route path="/market" element={<Market />} />
+        <Route path="/weather" element={<Weather />} />
         <Route path="/schemes" element={<Schemes />} />
         <Route path="/community" element={<Community />} />
         <Route path="/profile" element={<Profile />} />
