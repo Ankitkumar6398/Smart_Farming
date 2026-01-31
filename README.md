@@ -1,1 +1,1 @@
-This is Smart Farming based Web Application.
+This is Kishan Mitra - a farmer's companion web application.

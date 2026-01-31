@@ -138,7 +138,7 @@ const Home = () => {
               </>
             ) : (
               <>
-                Smart Farming
+                Kishan Mitra
                 <span className="gradient-text"> Revolution</span>
               </>
             )}

@@ -1,6 +1,6 @@
-# Smart Farming Backend
+# Kishan Mitra Backend
 
-Backend server for the Smart Farming application with MongoDB connection.
+Backend server for the Kishan Mitra application with MongoDB connection.
 
 ## Setup Instructions
 
@@ -17,10 +17,10 @@ Create a `.env` file in the `backend` directory with the following content:
 ```env
 # MongoDB Connection String
 # For local MongoDB:
-MONGO_URI=mongodb://localhost:27017/smart-farming
+MONGO_URI=mongodb://localhost:27017/kishan-mitra
 
 # For MongoDB Atlas (cloud):
-# MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/smart-farming
+# MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/kishan-mitra
 
 # Server Port
 PORT=5000

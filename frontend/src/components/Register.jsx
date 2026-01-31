@@ -79,7 +79,7 @@ const Register = () => {
     <div className="auth-container">
       <div className="auth-card">
         <div className="auth-header">
-          <h1>🌱 Join Smart Farming</h1>
+          <h1>🌱 Join Kishan Mitra</h1>
           <p>Create your account to get started</p>
         </div>
 

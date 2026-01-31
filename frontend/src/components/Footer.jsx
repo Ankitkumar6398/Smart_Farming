@@ -10,7 +10,7 @@ const Footer = () => {
         {/* About Section */}
         <div className="footer-section about">
           <div className="footer-logo">
-            <h2>Smart Farming</h2>
+            <h2>Kishan Mitra</h2>
           </div>
 
           <p className="footer-description">
@@ -71,7 +71,7 @@ const Footer = () => {
       {/* Footer Bottom */}
       <div className="footer-bottom">
         <div className="footer-bottom-content">
-          <p>© 2025 Smart Farming | All Rights Reserved</p>
+          <p>© 2025 Kishan Mitra | All Rights Reserved</p>
 
           <div className="footer-bottom-links">
             <Link to="/">Privacy Policy</Link>

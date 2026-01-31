@@ -46,7 +46,7 @@ const Navbar = () => {
 
   return (
     <nav className="navbar">
-      <Link to="/" className="logo">🌱 Smart Farming</Link>
+      <Link to="/" className="logo">🌱 Kishan Mitra</Link>
       <ul className="nav-links">
         <li><Link to="/">Home</Link></li>
         <li><Link to="/crop-health">Crop Health</Link></li>

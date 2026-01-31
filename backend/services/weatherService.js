@@ -180,6 +180,7 @@ const getWeatherForecast = async (city, countryCode = "in") => {
 const normalizeWeatherData = (data) => {
   if (!data) return null;
 
+  const rain1h = data.rain?.["1h"] ?? data.rain?.["3h"] ?? 0;
   return {
     temperature: Math.round(data.main?.temp || 0),
     feelsLike: Math.round(data.main?.feels_like || 0),
@@ -192,6 +193,7 @@ const normalizeWeatherData = (data) => {
     windDirection: data.wind?.deg || 0,
     visibility: data.visibility ? (data.visibility / 1000).toFixed(1) : null,
     cloudiness: data.clouds?.all || 0,
+    rain1h: Number(rain1h) || 0,
     city: data.name || "",
     country: data.sys?.country || "",
     sunrise: data.sys?.sunrise ? new Date(data.sys.sunrise * 1000) : null,

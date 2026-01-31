@@ -1,7 +1,7 @@
 {
-  "name": "smart-farming-backend",
+  "name": "kishan-mitra-backend",
   "version": "1.0.0",
-  "description": "Backend server for Smart Farming application",
+  "description": "Backend server for Kishan Mitra application",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -11,7 +11,7 @@
     "test:api": "node scripts/testApi.js"
   },
   "keywords": [
-    "smart-farming",
+    "kishan-mitra",
     "mongodb",
     "express"
   ],
