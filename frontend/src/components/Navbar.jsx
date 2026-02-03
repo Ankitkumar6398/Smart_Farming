@@ -4,7 +4,10 @@ import "../styles/Navbar.css";
 
 const Navbar = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
+
+  const closeMenu = () => setMenuOpen(false);
 
   useEffect(() => {
     // Check if user is authenticated
@@ -46,24 +49,33 @@ const Navbar = () => {
 
   return (
     <nav className="navbar">
-      <Link to="/" className="logo">🌱 Kishan Mitra</Link>
-      <ul className="nav-links">
-        <li><Link to="/">Home</Link></li>
-        <li><Link to="/crop-health">Crop Health</Link></li>
-        <li><Link to="/irrigation">Irrigation</Link></li>
-        <li><Link to="/market">Market</Link></li>
-        <li><Link to="/weather">Weather</Link></li>
-        <li><Link to="/community">Community</Link></li>
-        <li><Link to="/schemes">Schemes</Link></li>
+      <Link to="/" className="logo" onClick={closeMenu}>🌱 Kishan Mitra</Link>
+      <button
+        type="button"
+        className="nav-toggle"
+        onClick={() => setMenuOpen((o) => !o)}
+        aria-label="Toggle menu"
+      >
+        {menuOpen ? "✕" : "☰"}
+      </button>
+      <ul className={`nav-links ${menuOpen ? "nav-open" : ""}`}>
+        <li><Link to="/" onClick={closeMenu}>Home</Link></li>
+        <li><Link to="/crop-health" onClick={closeMenu}>Crop Health</Link></li>
+        <li><Link to="/crop-recommendation" onClick={closeMenu}>Crop Recommendation</Link></li>
+        <li><Link to="/irrigation" onClick={closeMenu}>Smart Irrigation</Link></li>
+        <li><Link to="/market" onClick={closeMenu}>Market</Link></li>
+        <li><Link to="/weather" onClick={closeMenu}>Weather</Link></li>
+        <li><Link to="/community" onClick={closeMenu}>Community</Link></li>
+        <li><Link to="/schemes" onClick={closeMenu}>Government Schemes</Link></li>
         {isAuthenticated ? (
           <>
-            <li><Link to="/profile">Profile</Link></li>
-            <li><button onClick={handleLogout} className="nav-logout-btn">Logout</button></li>
+            <li><Link to="/profile" onClick={closeMenu}>Profile</Link></li>
+            <li><button type="button" onClick={() => { closeMenu(); handleLogout(); }} className="nav-logout-btn">Logout</button></li>
           </>
         ) : (
           <>
-            <li><Link to="/login">Login</Link></li>
-            <li><Link to="/register" className="nav-register-btn">Sign Up</Link></li>
+            <li><Link to="/login" onClick={closeMenu}>Login</Link></li>
+            <li><Link to="/register" className="nav-register-btn" onClick={closeMenu}>Sign Up</Link></li>
           </>
         )}
       </ul>

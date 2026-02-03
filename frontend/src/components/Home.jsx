@@ -82,6 +82,13 @@ const Home = () => {
       path: "/crop-health"
     },
     { 
+      img: cropImg,
+      title: "Crop Recommendation",
+      desc: "Get crop suggestions based on your location's weather (temperature & humidity).",
+      gradient: "linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%)",
+      path: "/crop-recommendation"
+    },
+    { 
       img: irrigationImg,
       title: "Smart Irrigation System",
       desc: "Intelligent irrigation scheduling using weather and soil moisture data.",

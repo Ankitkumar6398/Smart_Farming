@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Home from "./components/Home";
 import CropHealth from "./components/CropHealth";
+import CropRecommendation from "./components/CropRecommendation";
 import Irrigation from "./components/Irrigation";
 import Market from "./components/Market";
 import Footer from "./components/Footer";
@@ -21,6 +22,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/crop-health" element={<CropHealth />} />
+        <Route path="/crop-recommendation" element={<CropRecommendation />} />
         <Route path="/irrigation" element={<Irrigation />} />
         <Route path="/market" element={<Market />} />
         <Route path="/weather" element={<Weather />} />
