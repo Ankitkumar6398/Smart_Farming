@@ -5,30 +5,58 @@ const CropHealth = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [preview, setPreview] = useState(null);
   const [result, setResult] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
+    if (!file) return;
     setSelectedImage(file);
     setPreview(URL.createObjectURL(file));
     setResult(null); // Clear previous result
+    setError("");
   };
 
-  const handleAnalyze = () => {
+  const handleAnalyze = async () => {
     if (!selectedImage) return alert("Please upload an image first.");
 
-    // Temporary demo output (AI connection will be added later)
-    setTimeout(() => {
-      setResult({
-        disease: "Leaf Spot Detected",
-        accuracy: "92% (demo estimation)",
-        description:
-          "Leaf spot is a common fungal issue that creates small brown or black circular marks on leaves.",
-        treatment:
-          "Use an organic neem oil spray twice a week. Remove affected leaves and improve air circulation. Avoid overhead watering.",
-        prevention:
-          "Ensure proper spacing between plants, avoid waterlogging, and monitor leaves weekly to catch early symptoms."
+    try {
+      setLoading(true);
+      setError("");
+
+      const formData = new FormData();
+      formData.append("image", selectedImage);
+
+      const response = await fetch(`${API_URL}/api/crop-health/analyze`, {
+        method: "POST",
+        body: formData,
       });
-    }, 1000);
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || "Failed to analyze image");
+      }
+
+      const analysis = data.data || {};
+
+      setResult({
+        cropType: analysis.crop_type || "Unknown",
+        disease: analysis.disease || "Unknown",
+        accuracy: analysis.confidence != null ? `${Math.round(analysis.confidence * 100)}%` : "N/A",
+        description: analysis.description || "",
+        treatment: analysis.treatment || "",
+        prevention: analysis.prevention || "",
+        recommendations: analysis.recommendations || null,
+      });
+    } catch (err) {
+      setError(err.message || "Failed to analyze image");
+      setResult(null);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -36,8 +64,7 @@ const CropHealth = () => {
       <h1>Crop Health Detection</h1>
       <p>
         Upload a leaf image to receive instant AI-assisted disease identification,
-        treatment suggestions, and prevention guidance.  
-        This version is a demo — full AI integration will be added soon.
+        treatment suggestions, and prevention guidance.
       </p>
 
       {/* --- Steps Section --- */}
@@ -68,6 +95,7 @@ const CropHealth = () => {
           type="file"
           id="image-upload"
           accept="image/*"
+          capture="environment"
           onChange={handleImageChange}
         />
 
@@ -95,9 +123,16 @@ const CropHealth = () => {
       )}
 
       {/* Analyze Button */}
-      <button onClick={handleAnalyze} disabled={!selectedImage}>
-        {selectedImage ? "Analyze Crop Health" : "Upload an Image to Continue"}
+      <button onClick={handleAnalyze} disabled={!selectedImage || loading}>
+        {loading ? "Analyzing..." : selectedImage ? "Analyze Crop Health" : "Upload an Image to Continue"}
       </button>
+
+      {error && (
+        <div className="result-card" style={{ marginTop: "20px", borderColor: "#f5c2c7" }}>
+          <h2 style={{ color: "#b42318" }}>Analysis Error</h2>
+          <p>{error}</p>
+        </div>
+      )}
 
       {/* Result Section */}
       {result && (
@@ -106,12 +141,17 @@ const CropHealth = () => {
 
           <div className="result-info">
             <div className="info-block">
+              <strong>Crop Type:</strong>
+              <p className="disease-badge" style={{ background: "#e3f2fd", color: "#1565c0" }}>{result.cropType}</p>
+            </div>
+
+            <div className="info-block">
               <strong>Disease Detected:</strong>
               <p className="disease-badge">{result.disease}</p>
             </div>
 
             <div className="info-block">
-              <strong>Accuracy (Demo):</strong>
+              <strong>Confidence:</strong>
               <p>{result.accuracy}</p>
             </div>
 
@@ -130,6 +170,13 @@ const CropHealth = () => {
             <strong>Prevention Tips</strong>
             <p>{result.prevention}</p>
           </div>
+
+          {result.recommendations && (
+            <div className="treatment-section">
+              <strong>Additional Recommendations</strong>
+              <p>{result.recommendations}</p>
+            </div>
+          )}
         </div>
       )}
 
@@ -139,11 +186,6 @@ const CropHealth = () => {
         <p>
           AI-powered crop protection helps farmers detect diseases early,
           reduce pesticide usage, protect yield, and avoid major crop losses.
-        </p>
-
-        <p>
-          Real-time crop disease identification will be enabled in the next
-          update using machine learning and image classification models.
         </p>
       </div>
     </div>
