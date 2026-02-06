@@ -1,0 +1,20 @@
+# Ignore Python cache files
+__pycache__/
+*.pyc
+
+# Ignore virtual environment
+venv/
+
+# Ignore node_modules (if you're working with frontend)
+node_modules/
+
+# Ignore Kaggle API credentials
+.kaggle/
+
+# Ignore Flask instance and configuration files
+instance/
+*.cfg
+
+# Ignore Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+.env

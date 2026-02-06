@@ -242,6 +242,94 @@
   color: #a7d129;
 }
 
+/* ChatBoat Floating Button & Panel */
+.chatboat-fab-wrapper {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1000;
+}
+
+.chatboat-fab {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4e7c32 0%, #3f6628 100%);
+  color: white;
+  border: none;
+  font-size: 1.8rem;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(78, 124, 50, 0.4);
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chatboat-fab:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(78, 124, 50, 0.5);
+}
+
+.chatboat-panel {
+  position: absolute;
+  bottom: 80px;
+  right: 0;
+  width: 420px;
+  max-width: calc(100vw - 48px);
+  height: 560px;
+  max-height: calc(100vh - 180px);
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.chatboat-fab-wrapper.open .chatboat-panel {
+  display: flex;
+}
+
+.chatboat-close-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #f0f0f0;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease;
+}
+
+.chatboat-close-btn:hover {
+  background: #e0e0e0;
+}
+
+.chatboat-panel .chatboat-container.chatboat-embedded {
+  margin: 0;
+  padding: 1rem;
+  height: 100%;
+  min-height: auto;
+  box-shadow: none;
+}
+
+.chatboat-panel .chatboat-embedded .chatboat-header h1 {
+  font-size: 1.2rem;
+}
+
+.chatboat-panel .chatboat-embedded .chatboat-messages {
+  flex: 1;
+  min-height: 0;
+}
+
 @media (max-width: 768px) {
   .hero-section {
     padding: 40px 4%;
@@ -269,5 +357,20 @@
 
   .modules-grid {
     grid-template-columns: 1fr;
+  }
+
+  .chatboat-panel {
+    width: calc(100vw - 32px);
+    right: -12px;
+    height: 70vh;
+    max-height: 500px;
+  }
+
+  .chatboat-fab {
+    width: 54px;
+    height: 54px;
+    font-size: 1.5rem;
+    bottom: 16px;
+    right: 16px;
   }
 }

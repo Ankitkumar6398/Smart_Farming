@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import ChatBoat from "./ChatBoat";
 import "../styles/Home.css";
 
 const Home = () => {
   const navigate = useNavigate();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
+  const [chatOpen, setChatOpen] = useState(false);
 
   useEffect(() => {
     // Check if user is authenticated
@@ -233,6 +235,27 @@ const Home = () => {
           ))}
         </div>
       </section>
+
+      {/* Floating ChatBoat Button & Panel */}
+      <div className={`chatboat-fab-wrapper ${chatOpen ? "open" : ""}`}>
+        <div className="chatboat-panel">
+          <button
+            className="chatboat-close-btn"
+            onClick={() => setChatOpen(false)}
+            aria-label="Close chat"
+          >
+            ✕
+          </button>
+          <ChatBoat embedded />
+        </div>
+        <button
+          className="chatboat-fab"
+          onClick={() => setChatOpen(!chatOpen)}
+          aria-label="Open ChatBoat"
+        >
+          {chatOpen ? "✕" : "🤖"}
+        </button>
+      </div>
     </div>
   );
 };
