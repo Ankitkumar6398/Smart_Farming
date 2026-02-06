@@ -113,9 +113,15 @@ const Market = () => {
     try {
       const res = await fetch(`${API_URL}/api/market/states`);
       const json = await res.json();
-      if (json.success) setStates(json.data);
-    } catch {
-      console.error("Error loading states");
+      console.log("States API response:", json);
+      if (json.success && json.data) {
+        setStates(json.data);
+        console.log("States loaded:", json.data.length);
+      } else {
+        console.warn("States API returned unsuccessful response:", json);
+      }
+    } catch (err) {
+      console.error("Error loading states:", err);
     }
   };
 
@@ -125,9 +131,15 @@ const Market = () => {
         `${API_URL}/api/market/districts?state=${encodeURIComponent(state)}`
       );
       const json = await res.json();
-      if (json.success) setDistricts(json.data);
-    } catch {
-      console.error("Error loading districts");
+      console.log("Districts API response:", json);
+      if (json.success && json.data) {
+        setDistricts(json.data);
+        console.log("Districts loaded:", json.data.length);
+      } else {
+        console.warn("Districts API returned unsuccessful response:", json);
+      }
+    } catch (err) {
+      console.error("Error loading districts:", err);
     }
   };
 
@@ -135,9 +147,15 @@ const Market = () => {
     try {
       const res = await fetch(`${API_URL}/api/market/crops`);
       const json = await res.json();
-      if (json.success) setCrops(json.data);
-    } catch {
-      console.error("Error loading crops");
+      console.log("Crops API response:", json);
+      if (json.success && json.data) {
+        setCrops(json.data);
+        console.log("Crops loaded:", json.data.length);
+      } else {
+        console.warn("Crops API returned unsuccessful response:", json);
+      }
+    } catch (err) {
+      console.error("Error loading crops:", err);
     }
   };
 
@@ -148,10 +166,16 @@ const Market = () => {
 
       const res = await fetch(`${API_URL}/api/market/markets?${params}`);
       const json = await res.json();
+      console.log("Markets API response:", json);
 
-      if (json.success) setMarkets(json.data);
-    } catch {
-      console.error("Error loading markets");
+      if (json.success && json.data) {
+        setMarkets(json.data);
+        console.log("Markets loaded:", json.data.length);
+      } else {
+        console.warn("Markets API returned unsuccessful response:", json);
+      }
+    } catch (err) {
+      console.error("Error loading markets:", err);
     }
   };
 
@@ -378,16 +402,20 @@ const Market = () => {
           </div>
 
           <div className="filter-group">
-            <label>State</label>
+            <label>State {states.length === 0 && <span style={{color: '#ff6b6b', fontSize: '0.8rem'}}>(Loading...)</span>}</label>
             <select
               value={selectedState}
               onChange={(e) => setSelectedState(e.target.value)}
               className="filter-select"
             >
               <option value="">All States</option>
-              {states.map((s, i) => (
-                <option key={i}>{s}</option>
-              ))}
+              {states.length === 0 ? (
+                <option value="" disabled>Loading states...</option>
+              ) : (
+                states.map((s, i) => (
+                  <option key={i} value={s}>{s}</option>
+                ))
+              )}
             </select>
           </div>
 
@@ -401,22 +429,26 @@ const Market = () => {
             >
               <option value="">All Districts</option>
               {districts.map((d, i) => (
-                <option key={i}>{d}</option>
+                <option key={i} value={d}>{d}</option>
               ))}
             </select>
           </div>
 
           <div className="filter-group">
-            <label>Crop</label>
+            <label>Crop {crops.length === 0 && <span style={{color: '#ff6b6b', fontSize: '0.8rem'}}>(Loading...)</span>}</label>
             <select
               value={selectedCrop}
               onChange={(e) => setSelectedCrop(e.target.value)}
               className="filter-select"
             >
               <option value="">All Crops</option>
-              {crops.map((c, i) => (
-                <option key={i}>{c}</option>
-              ))}
+              {crops.length === 0 ? (
+                <option value="" disabled>Loading crops...</option>
+              ) : (
+                crops.map((c, i) => (
+                  <option key={i} value={c}>{c}</option>
+                ))
+              )}
             </select>
           </div>
 
@@ -430,7 +462,7 @@ const Market = () => {
             >
               <option value="">All Markets</option>
               {markets.map((m, i) => (
-                <option key={i}>{m}</option>
+                <option key={i} value={m}>{m}</option>
               ))}
             </select>
           </div>

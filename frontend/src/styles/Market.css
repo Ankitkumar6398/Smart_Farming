@@ -20,6 +20,8 @@ body, .market-container, * {
 
   --wheat-yellow: #D9B650;
   --harvest-gold: #C9A444;
+  --yellow-wheat: #D9B650;
+  --yellow-soft: #F0D98A;
 
   --sky-blue: #A7C7E7;
   --water-blue: #6FA5CC;
@@ -27,10 +29,18 @@ body, .market-container, * {
   --text-dark: #3C352E;
   --text-medium: #6B625A;
   --text-light: #9A9188;
+  --brown-text: #6B625A;
 
   --white: #FFFFFF;
   --bg-light: #F8F6F2;
+  --bg-main: #F8F6F2;
+  --bg-white: #FFFFFF;
+  --bg-soft: #F4EFE6;
   --border: #E3DED6;
+
+  --radius: 8px;
+  --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --transition: all 0.3s ease;
 }
 
 
@@ -116,6 +126,19 @@ body, .market-container, * {
 .filter-select:focus {
   border-color: var(--green-primary);
   background: var(--bg-white);
+  outline: none;
+}
+
+.filter-select option {
+  background: var(--bg-white);
+  color: var(--text-dark);
+  padding: 0.5rem;
+}
+
+.filter-select:disabled {
+  background: #f5f5f5;
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 
 /* -------------------------------------------------------------
