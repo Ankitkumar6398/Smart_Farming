@@ -9,21 +9,52 @@ const router = express.Router();
 // @access  Public
 router.get('/', async (req, res) => {
   try {
-    const { state, district, date, crop, market, useRealtime } = req.query;
+    // Get and clean query parameters
+    const state = req.query.state && req.query.state.trim() !== '' ? req.query.state.trim() : null;
+    const district = req.query.district && req.query.district.trim() !== '' ? req.query.district.trim() : null;
+    const crop = req.query.crop && req.query.crop.trim() !== '' ? req.query.crop.trim() : null;
+    const market = req.query.market && req.query.market.trim() !== '' ? req.query.market.trim() : null;
+    const date = req.query.date && req.query.date.trim() !== '' ? req.query.date.trim() : null;
+    const useRealtime = req.query.useRealtime === 'true';
+    
+    console.log('📥 Received query params:', { 
+      state: state || '(none)', 
+      district: district || '(none)', 
+      crop: crop || '(none)', 
+      market: market || '(none)',
+      date: date || '(none)',
+      useRealtime 
+    });
 
     // If useRealtime is true, try to fetch from external API first
     if (useRealtime === 'true') {
       try {
         console.log('🔄 Attempting to fetch real-time data from external API...');
+        
         // Build params object, only including defined and non-empty values
         const realtimeParams = {};
-        if (state && state.trim()) realtimeParams.state = state.trim();
-        if (district && district.trim()) realtimeParams.district = district.trim();
-        if (crop && crop.trim()) realtimeParams.crop = crop.trim();
-        if (market && market.trim()) realtimeParams.market = market.trim();
-        realtimeParams.limit = 100; // Ensure we get enough results
+        if (state && typeof state === 'string' && state.trim()) {
+          realtimeParams.state = state.trim();
+        }
+        if (district && typeof district === 'string' && district.trim()) {
+          realtimeParams.district = district.trim();
+        }
+        if (crop && typeof crop === 'string' && crop.trim()) {
+          realtimeParams.crop = crop.trim();
+        }
+        if (market && typeof market === 'string' && market.trim()) {
+          realtimeParams.market = market.trim();
+        }
+        realtimeParams.limit = 200;
+        
+        const activeFilters = Object.keys(realtimeParams).filter(k => k !== 'limit');
+        console.log(`📋 Active Filters:`, activeFilters.length > 0 
+          ? activeFilters.reduce((acc, key) => ({ ...acc, [key]: realtimeParams[key] }), {})
+          : 'None (fetching all records)');
         
         const realtimeData = await getRealTimeData(realtimeParams);
+        console.log(`📊 API returned ${realtimeData ? realtimeData.length : 0} records`);
+        
         if (realtimeData && realtimeData.length > 0) {
           console.log(`✅ Successfully fetched ${realtimeData.length} records from external API`);
           return res.status(200).json({
@@ -31,12 +62,15 @@ router.get('/', async (req, res) => {
             count: realtimeData.length,
             data: realtimeData,
             source: 'external_api',
+            message: `Fetched ${realtimeData.length} real-time prices from external API`,
+            filters: activeFilters.length > 0 ? realtimeParams : null,
           });
         } else {
           console.log('⚠️ External API returned no data, falling back to database');
         }
       } catch (error) {
-        console.error('❌ Error fetching real-time data, falling back to database:', error.message);
+        console.error('❌ Error fetching real-time data:', error.message);
+        console.error('Stack:', error.stack);
         // Fall through to database query
       }
     }
@@ -45,7 +79,7 @@ router.get('/', async (req, res) => {
     const query = {};
 
     if (state) {
-      query.state = new RegExp(state, 'i'); // Case-insensitive search
+      query.state = new RegExp(state, 'i');
     }
 
     if (district) {
@@ -58,6 +92,11 @@ router.get('/', async (req, res) => {
 
     if (market) {
       query.market = new RegExp(market, 'i');
+    }
+    
+    const activeDbFilters = Object.keys(query);
+    if (activeDbFilters.length > 0) {
+      console.log(`💾 Database query filters:`, activeDbFilters);
     }
 
     if (date) {
@@ -576,16 +615,30 @@ router.post('/sync-realtime', async (req, res) => {
 // @access  Public
 router.get('/realtime', async (req, res) => {
   try {
-    const { state, district, crop, market, limit = 100 } = req.query;
+    const { state, district, crop, market, limit = 200 } = req.query;
 
     // Build params object, only including defined and non-empty values
     const realtimeParams = {
-      limit: parseInt(limit),
+      limit: parseInt(limit) || 200,
     };
-    if (state && state.trim()) realtimeParams.state = state.trim();
-    if (district && district.trim()) realtimeParams.district = district.trim();
-    if (crop && crop.trim()) realtimeParams.crop = crop.trim();
-    if (market && market.trim()) realtimeParams.market = market.trim();
+    
+    if (state && typeof state === 'string' && state.trim()) {
+      realtimeParams.state = state.trim();
+    }
+    if (district && typeof district === 'string' && district.trim()) {
+      realtimeParams.district = district.trim();
+    }
+    if (crop && typeof crop === 'string' && crop.trim()) {
+      realtimeParams.crop = crop.trim();
+    }
+    if (market && typeof market === 'string' && market.trim()) {
+      realtimeParams.market = market.trim();
+    }
+
+    const activeFilters = Object.keys(realtimeParams).filter(k => k !== 'limit');
+    console.log(`🔄 Real-time API call with filters:`, activeFilters.length > 0 
+      ? activeFilters.reduce((acc, key) => ({ ...acc, [key]: realtimeParams[key] }), {})
+      : 'None');
 
     const realtimeData = await getRealTimeData(realtimeParams);
 
@@ -594,6 +647,7 @@ router.get('/realtime', async (req, res) => {
       count: realtimeData.length,
       data: realtimeData,
       source: 'external_api',
+      filters: activeFilters.length > 0 ? realtimeParams : null,
     });
   } catch (error) {
     console.error('Get real-time data error:', error);

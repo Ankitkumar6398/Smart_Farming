@@ -15,13 +15,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Routes
-<<<<<<< Updated upstream
 app.get('/', (req, res) => {
   res.json({ message: 'Kishan Mitra API is running!' });
-=======
-app.get("/", (req, res) => {
-  res.json({ message: "Smart Farming API is running!" });
->>>>>>> Stashed changes
 });
 
 // Health check endpoint

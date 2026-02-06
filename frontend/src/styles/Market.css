@@ -130,6 +130,7 @@ body, .market-container, * {
 
 .btn-reset,
 .btn-refresh,
+.btn-realtime,
 .btn-sync {
   padding: .7rem 1.3rem;
   border-radius: var(--radius);
@@ -155,6 +156,15 @@ body, .market-container, * {
 }
 .btn-refresh:hover {
   background: var(--green-dark);
+}
+
+/* Realtime Button */
+.btn-realtime {
+  background: #2196F3;
+  color: white;
+}
+.btn-realtime:hover {
+  background: #1976D2;
 }
 
 /* Sync Button */
@@ -203,6 +213,22 @@ body, .market-container, * {
   text-align: center;
   color: var(--text-medium);
   font-size: .9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.data-source-badge {
+  display: inline-block;
+  padding: 0.25rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: rgba(33, 150, 243, 0.15);
+  color: #1976D2;
+  border: 1px solid rgba(33, 150, 243, 0.3);
 }
 
 /* -------------------------------------------------------------

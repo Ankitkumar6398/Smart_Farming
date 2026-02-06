@@ -44,6 +44,7 @@ const Market = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncMessage, setSyncMessage] = useState(null);
+  const [dataSource, setDataSource] = useState(null);
 
   // Chart crop filter
   const [selectedCropFromLegend, setSelectedCropFromLegend] = useState(null);
@@ -159,33 +160,79 @@ const Market = () => {
      FETCH PRICES (REALTIME FIRST, THEN DB)
   -------------------------------------------------------------- */
 
-  const fetchMarketPrices = async (useRealtime = true) => {
+  const fetchMarketPrices = async (forceRealtime = false) => {
     try {
       setLoading(false);
       setIsRefreshing(true);
 
       const params = new URLSearchParams();
-      if (selectedState) params.append("state", selectedState);
-      if (selectedDistrict) params.append("district", selectedDistrict);
-      if (selectedCrop) params.append("crop", selectedCrop);
-      if (selectedMarket) params.append("market", selectedMarket);
-      if (selectedDate) params.append("date", selectedDate);
-      if (useRealtime) params.append("useRealtime", "true");
+      if (selectedState && selectedState.trim()) params.append("state", selectedState.trim());
+      if (selectedDistrict && selectedDistrict.trim()) params.append("district", selectedDistrict.trim());
+      if (selectedCrop && selectedCrop.trim()) params.append("crop", selectedCrop.trim());
+      if (selectedMarket && selectedMarket.trim()) params.append("market", selectedMarket.trim());
+      if (selectedDate && selectedDate.trim()) params.append("date", selectedDate.trim());
+      
+      console.log("🔍 Frontend sending filters:", {
+        state: selectedState || "(none)",
+        district: selectedDistrict || "(none)",
+        crop: selectedCrop || "(none)",
+        market: selectedMarket || "(none)",
+        date: selectedDate || "(none)",
+      });
 
-      let res = await fetch(`${API_URL}/api/market?${params}`);
-      let json = await res.json();
+      let json = { success: false, data: [] };
+      let source = "unknown";
 
-      if (!json.success && useRealtime) {
+      if (forceRealtime) {
         try {
-          params.delete("useRealtime");
-          res = await fetch(`${API_URL}/api/market/realtime?${params}`);
+          const res = await fetch(`${API_URL}/api/market/realtime?${params}`);
           json = await res.json();
-        } catch {}
+          if (json.success && json.data && json.data.length > 0) {
+            setPrices(json.data);
+            setDataSource("external_api");
+            setLastUpdated(new Date());
+            setIsRefreshing(false);
+            setLoading(false);
+            return;
+          }
+        } catch (err) {
+          console.error("Realtime API error:", err);
+        }
       }
 
-      setPrices(json.success ? json.data : []);
+      params.append("useRealtime", "true");
+      try {
+        const res = await fetch(`${API_URL}/api/market?${params}`);
+        json = await res.json();
+        source = json.source || "database";
+        if (json.success && json.data && json.data.length > 0) {
+          setPrices(json.data);
+          setDataSource(source);
+          setLastUpdated(new Date());
+          setIsRefreshing(false);
+          setLoading(false);
+          return;
+        }
+      } catch (err) {
+        console.error("Market API error:", err);
+      }
+
+      if (!json.success || !json.data || json.data.length === 0) {
+        params.delete("useRealtime");
+        try {
+          const res = await fetch(`${API_URL}/api/market?${params}`);
+          json = await res.json();
+          source = json.source || "database";
+        } catch (err) {
+          console.error("Database fallback error:", err);
+        }
+      }
+
+      setPrices(json.success && json.data ? json.data : []);
+      setDataSource(source);
       setLastUpdated(new Date());
-    } catch {
+    } catch (err) {
+      console.error("Fetch error:", err);
       setPrices([]);
       setLastUpdated(new Date());
     } finally {
@@ -397,10 +444,19 @@ const Market = () => {
 
           <button
             className="btn-refresh"
-            onClick={fetchMarketPrices}
+            onClick={() => fetchMarketPrices(false)}
             disabled={isRefreshing}
           >
             {isRefreshing ? "Refreshing..." : "Refresh"}
+          </button>
+
+          <button
+            className="btn-realtime"
+            onClick={() => fetchMarketPrices(true)}
+            disabled={isRefreshing}
+            title="Fetch real-time prices directly from external API"
+          >
+            {isRefreshing ? "Fetching..." : "🔄 Real-time Prices"}
           </button>
 
           <button
@@ -408,7 +464,7 @@ const Market = () => {
             onClick={handleSyncRealtime}
             disabled={isSyncing}
           >
-            {isSyncing ? "Syncing..." : "Sync Live Data"}
+            {isSyncing ? "Syncing..." : "Sync to Database"}
           </button>
 
           <label className="auto-refresh-toggle">
@@ -440,6 +496,11 @@ const Market = () => {
         {lastUpdated && (
           <div className="last-updated">
             Last updated at {formatTime(lastUpdated)} | Showing prices for {formatDate(selectedDate)}
+            {dataSource && (
+              <span className="data-source-badge">
+                {dataSource === "external_api" ? "🔄 Real-time" : "💾 Database"}
+              </span>
+            )}
           </div>
         )}
       </div>
