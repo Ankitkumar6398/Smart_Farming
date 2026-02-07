@@ -21,6 +21,7 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # Load API Key from environment variable
 GENAI_API_KEY = os.getenv('GOOGLE_API_KEY')  # Ensure your API key is set in the environment
+print(GENAI_API_KEY)
 if not GENAI_API_KEY:
     logging.error("No API_KEY found. Please set the GOOGLE_API_KEY environment variable.")
     raise ValueError("No API_KEY found. Please set the GOOGLE_API_KEY environment variable.")
@@ -36,9 +37,22 @@ def get_genai_client():
 
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png', 'gif', 'webp'}
 
+MIME_TYPES = {
+    'jpg': 'image/jpeg',
+    'jpeg': 'image/jpeg',
+    'png': 'image/png',
+    'gif': 'image/gif',
+    'webp': 'image/webp',
+}
+
 def allowed_file(filename):
     """Check if the uploaded file is in an allowed format."""
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def get_mime_type(filename):
+    """Return the MIME type based on the file extension."""
+    ext = filename.rsplit('.', 1)[1].lower()
+    return MIME_TYPES.get(ext, 'application/octet-stream')
 
 def generate_prompt(user_query, language):
     """Generate a structured prompt for plant health analysis with numbered, concise responses."""
@@ -113,14 +127,15 @@ def upload_file():
         prompt = generate_prompt(user_query, language)
 
         # Upload the file to the Gemini AI API
+        mime_type = get_mime_type(filename)
         genai_client = get_genai_client()
-        sample_file = genai_client.files.upload(file=open(file_path, 'rb'))
-
-        # Create the model instance
-        model = genai_client.models.get_model("gemini-1.5-flash")
+        sample_file = genai_client.files.upload(file=open(file_path, 'rb'), config={"mime_type": mime_type})
 
         # Call the API with the prompt and the uploaded file
-        response = model.generate_content([prompt, sample_file])
+        response = genai_client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=[prompt, sample_file],
+        )
 
         if response and hasattr(response, 'text'):
             logging.info(f"Analysis Result: {response.text}")
@@ -174,10 +189,12 @@ def chat():
             return jsonify({"response": resp}), 400
 
         genai_client = get_genai_client()
-        model = genai_client.models.get_model("gemini-1.5-flash")
         prompt = get_chat_prompt(user_message, language)
 
-        response = model.generate_content(prompt)
+        response = genai_client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=prompt,
+        )
 
         if response and hasattr(response, 'text') and response.text:
             return jsonify({"response": response.text.strip()}), 200
